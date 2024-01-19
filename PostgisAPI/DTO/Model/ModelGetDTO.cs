@@ -1,10 +1,8 @@
-﻿using NetTopologySuite.Geometries;
-using PostgisUltilities;
-
-namespace PostgisAPI.DTO.Model
+﻿namespace PostgisAPI.DTO.Model
 {
     public class ModelGetDTO : ModelCreateDTO
     {
+        public Guid ModelID { get; set; }
         public DateTime LastModifiedTime { get; set; }
     }
 }

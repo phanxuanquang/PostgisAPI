@@ -37,6 +37,7 @@ namespace PostgisAPI.Controllers
                 ModelID = item.ModelID,
                 ModelItemID = item.ModelItemID,
                 HierarchyIndex = item.HierarchyIndex,
+                ParentHierachyIndex = item.ParentHierachyIndex,
                 DisplayName = item.DisplayName,
                 Path = item.Path,
                 Color = JsonConvert.DeserializeObject<Color>(item.Color),
@@ -72,6 +73,7 @@ namespace PostgisAPI.Controllers
                 ModelID = modelItem.ModelID,
                 ModelItemID = modelItem.ModelItemID,
                 HierarchyIndex = modelItem.HierarchyIndex,
+                ParentHierachyIndex = modelItem.ParentHierachyIndex,
                 DisplayName = modelItem.DisplayName,
                 Path = modelItem.Path,
                 Color = JsonConvert.DeserializeObject<Color>(modelItem.Color),
@@ -93,13 +95,14 @@ namespace PostgisAPI.Controllers
         /// <param name="modelItemDTO">The data to create the new model item.</param>
         /// <returns>Returns the created <see cref="ModelItem"/>.</returns>
         [HttpPost("{modelid}")]
-        public ActionResult<ModelItem> Post(Guid modelid, ModelItemCreateDTO modelItemDTO)
+        public ActionResult<ModelItem> Create(Guid modelid, ModelItemCreateDTO modelItemDTO)
         {
             ModelItem modelItem = new ModelItem
             {
-                ModelItemID = modelItemDTO.ModelItemID,
+                ModelItemID = Guid.NewGuid(),
                 HierarchyIndex = modelItemDTO.HierarchyIndex,
-                ModelID = modelid, // 08f54e0f-c3a1-42ea-8943-f58cd74a2c75
+                ParentHierachyIndex = modelItemDTO.ParentHierachyIndex,
+                ModelID = modelid,
                 BatchedModelItemID = modelItemDTO.BatchedModelItemID,
                 DisplayName = modelItemDTO.DisplayName,
                 Path = modelItemDTO.Path,
@@ -130,6 +133,7 @@ namespace PostgisAPI.Controllers
                 ModelID = item.ModelID,
                 ModelItemID = item.ModelItemID,
                 HierarchyIndex = item.HierarchyIndex,
+                ParentHierachyIndex = item.ParentHierachyIndex,
                 DisplayName = item.DisplayName,
                 Path = item.Path,
                 Color = JsonConvert.DeserializeObject<Color>(item.Color),
@@ -157,6 +161,7 @@ namespace PostgisAPI.Controllers
                 ModelID = item.ModelID,
                 ModelItemID = item.ModelItemID,
                 HierarchyIndex = item.HierarchyIndex,
+                ParentHierachyIndex = item.ParentHierachyIndex,
                 DisplayName = item.DisplayName,
                 Path = item.Path,
                 Color = JsonConvert.DeserializeObject<Color>(item.Color),
@@ -192,6 +197,7 @@ namespace PostgisAPI.Controllers
                 ModelID = modelItem.ModelID,
                 ModelItemID = modelItem.ModelItemID,
                 HierarchyIndex = modelItem.HierarchyIndex,
+                ParentHierachyIndex = modelItem.ParentHierachyIndex,
                 DisplayName = modelItem.DisplayName,
                 Path = modelItem.Path,
                 Color = JsonConvert.DeserializeObject<Color>(modelItem.Color),

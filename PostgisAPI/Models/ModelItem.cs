@@ -1,6 +1,4 @@
-﻿using NetTopologySuite.Geometries;
-using NetTopologySuite.Index.HPRtree;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using PostgisAPI.Models.Supporters;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,8 +9,9 @@ namespace PostgisAPI.Models
     {
         [Column("id")]
         public int ID { get; set; }
-        [Column("hierarchyindex")]
-        public int? HierarchyIndex { get; set; }
+
+        [Column("hierachyindex")]
+        public int HierarchyIndex { get; set; }
 
         [Column("modelid")]
         public Guid ModelID { get; set; } = Guid.NewGuid();
@@ -20,22 +19,25 @@ namespace PostgisAPI.Models
         [Column("modelitemid")]
         public Guid ModelItemID { get; set; } = Guid.NewGuid();
 
+        [Column("parenthierachyindex")]
+        public int ParentHierachyIndex { get; set; }
+
         [Column("displayname")]
-        public string? DisplayName { get; set; }
+        public string DisplayName { get; set; }
         [Column("path")]
-        public string? Path { get; set; }
+        public string Path { get; set; }
         [Column("color", TypeName = "jsonb")]
-        public string? Color { get; set; }
+        public string Color { get; set; }
         [Column("mesh", TypeName = "jsonb")]
-        public string? Mesh { get; set; }
+        public string Mesh { get; set; }
         [Column("matrix", TypeName = "real[]")]
-        public double[]? Matrix { get; set; }
+        public double[] Matrix { get; set; }
         [Column("aabb", TypeName = "jsonb")]
         public string? AABB { get; set; }
         [Column("batchedmodelitemid")]
-        public Guid BatchedModelItemID { get; set; }
+        public Guid? BatchedModelItemID { get; set; }
         [Column("properties", TypeName = "jsonb")]
-        public string? Properties { get; set; }
+        public string Properties { get; set; }
         [Column("lastmodifiedtime")]
         public DateTime LastModifiedTime { get; set; } = DateTime.Now;
 

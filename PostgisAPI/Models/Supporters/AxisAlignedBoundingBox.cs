@@ -1,5 +1,4 @@
 ﻿using NetTopologySuite.Geometries;
-using PostgisUltilities;
 
 namespace PostgisAPI.Models.Supporters
 {

@@ -1,22 +1,23 @@
 CREATE TABLE IF NOT EXISTS Model (
     id SERIAL,
-    ModelID UUID PRIMARY KEY NOT NULL,
-    DisplayName TEXT DEFAULT NULL,
+    ModelID UUID DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
+    DisplayName TEXT,
     aabb JSONB DEFAULT NULL,
     LastModifiedTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS ModelItem (
 	ID SERIAL,
-	ModelItemID UUID PRIMARY KEY NOT NULL,
-	DisplayName TEXT DEFAULT NULL,
-	HierachyIndex INT DEFAULT NULL,
-	Path TEXT DEFAULT NULL,
-	Color JSONB DEFAULT NULL,
-	Mesh JSONB DEFAULT NULL,
-	Matrix REAL[] DEFAULT NULL,
-	aabb BOX3D DEFAULT NULL,
-    Properties JSONB DEFAULT NULL,
+	ModelItemID UUID DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
+	DisplayName TEXT,
+	HierachyIndex INT,
+	ParentHierachyIndex INT,
+	Path TEXT,
+	Color JSONB,
+	Mesh JSONB,
+	Matrix REAL[],
+	aabb JSONB DEFAULT NULL,
+    Properties JSONB,
 	LastModifiedTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	ModelID UUID REFERENCES Model(ModelID) NOT NULL,
     BatchedModelItemID UUID REFERENCES ModelItem(ModelItemID) DEFAULT NULL

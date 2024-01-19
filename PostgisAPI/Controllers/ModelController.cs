@@ -6,19 +6,12 @@ using PostgisAPI.Models.Supporters;
 
 namespace PostgisAPI.Controllers
 {
-    /// <summary>
-    /// Controller for model management
-    /// </summary>
     [ApiController]
     [Route("model")]
     public class ModelController : ControllerBase
     {
         private readonly ApiDbContext context;
 
-        /// <summary>
-        /// Initialize a controller for model
-        /// </summary>
-        /// <param name="dbContext"></param>
         public ModelController(ApiDbContext dbContext)
         {
             context = dbContext;
@@ -31,7 +24,7 @@ namespace PostgisAPI.Controllers
         /// <response code="200">Returns the list of model.</response>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ModelGetDTO>))]
-        public ActionResult<IEnumerable<ModelGetDTO>> Get()
+        public ActionResult<IEnumerable<ModelGetDTO>> GetAll()
         {
             IEnumerable<ModelGetDTO> models = context.Models.Select(item => new ModelGetDTO
             {
@@ -47,14 +40,14 @@ namespace PostgisAPI.Controllers
         /// <summary>
         /// Get a specific model by its ID.
         /// </summary>
-        /// <param name="modelid">The unique identifier of the model.</param>
+        /// <param name="modelid">The ID of the model.</param>
         /// <returns>Returns a <see cref="ModelGetDTO"/> representing the model.</returns>
         /// <response code="200">Returns the requested model.</response>
         /// <response code="404">If the model with the specified ID is not found.</response>
         [HttpGet("{modelid}")]
         [ProducesResponseType(200, Type = typeof(ModelGetDTO))]
         [ProducesResponseType(404)]
-        public ActionResult<ModelGetDTO> GetById(Guid modelid)
+        public ActionResult<ModelGetDTO> GetBy(Guid modelid)
         {
             Model? model = context.Models.FirstOrDefault(item => item.ModelID == modelid);
 
@@ -82,19 +75,18 @@ namespace PostgisAPI.Controllers
         /// <response code="201">Returns the newly created model.</response>
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(Model))]
-        public ActionResult<Model> Post(ModelCreateDTO modelItemDTO)
+        public ActionResult<string> Create(ModelCreateDTO modelItemDTO)
         {
             Model model = new Model
             {
-                ModelID = modelItemDTO.ModelID,
+                ModelID = Guid.NewGuid(),
                 DisplayName = modelItemDTO.DisplayName,
                 AABB = JsonConvert.SerializeObject(modelItemDTO.AABB),
             };
 
             context.Models.Add(model);
             context.SaveChanges();
-
-            return model;
+            return model.ModelID.ToString();
         }
     }
 }

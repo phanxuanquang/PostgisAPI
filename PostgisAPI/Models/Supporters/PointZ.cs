@@ -9,8 +9,8 @@ namespace PostgisAPI.Models.Supporters
         public double z { get; set; }
         public PointZ(double x = 0, double y = 0, double z = 0)
         {
-            this.x = x; 
-            this.y = y; 
+            this.x = x;
+            this.y = y;
             this.z = z;
         }
 

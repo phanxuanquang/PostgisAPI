@@ -13,7 +13,6 @@ namespace PostgisAPI
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Model>().ToTable("model").HasKey(m => m.ModelID);
-
             modelBuilder.Entity<ModelItem>().ToTable("modelitem").HasKey(m => m.ModelItemID);
 
             modelBuilder.Entity<Model>().Ignore(m => m.ID);

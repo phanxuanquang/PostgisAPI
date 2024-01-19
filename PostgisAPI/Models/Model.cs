@@ -10,9 +10,9 @@ namespace PostgisAPI.Models
         [Column("modelid")]
         public Guid ModelID { get; set; } = Guid.NewGuid();
         [Column("displayname")]
-        public string? DisplayName { get; set; }
+        public string DisplayName { get; set; }
         [Column("aabb", TypeName = "jsonb")]
-        public string? AABB { get; set; }
+        public string AABB { get; set; }
         [Column("lastmodifiedtime")]
         public DateTime LastModifiedTime { get; set; } = DateTime.Now;
     }

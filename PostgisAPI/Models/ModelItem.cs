@@ -1,4 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using NetTopologySuite.Geometries;
+using NetTopologySuite.Index.HPRtree;
+using Newtonsoft.Json;
+using PostgisAPI.Models.Supporters;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PostgisAPI.Models
 {
@@ -34,5 +38,11 @@ namespace PostgisAPI.Models
         public string? Properties { get; set; }
         [Column("lastmodifiedtime")]
         public DateTime LastModifiedTime { get; set; } = DateTime.Now;
+
+        public bool Contains(PointZ point)
+        {
+            AxisAlignedBoundingBox aabb = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(AABB);
+            return aabb.Contains(point);
+        }
     }
 }

@@ -27,6 +27,11 @@ namespace PostgisUltilities
             MinPoint = GetMinPoint(geometry);
             MaxPoint = GetMaxPoint(geometry);
         }
+        public AxisAlignedBoundingBox(Point MinPoint, Point MaxPoint)
+        {
+            this.MinPoint = MinPoint;
+            this.MaxPoint = MaxPoint;
+        }
 
         /// <summary>
         /// Convert the AABB into well-known text format

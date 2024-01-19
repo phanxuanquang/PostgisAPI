@@ -27,10 +27,10 @@ namespace PostgisAPI.Controllers
         /// <summary>
         /// Get a list of model items for a specific model.
         /// </summary>
-        /// <param name="modelid">The unique identifier of the model.</param>
+        /// <param name="modelid">The ID of the model.</param>
         /// <returns>Returns a list of <see cref="ModelItemGetDTO"/> representing the model items.</returns>
         [HttpGet("{modelid}")]
-        public ActionResult<IEnumerable<ModelItemGetDTO>> Get(Guid modelid)
+        public ActionResult<IEnumerable<ModelItemGetDTO>> GetAll(Guid modelid)
         {
             IEnumerable<ModelItemGetDTO> modelItemsDTO = context.ModelItems.Where(item => item.ModelID == modelid).Select(item => new ModelItemGetDTO
             {
@@ -54,8 +54,8 @@ namespace PostgisAPI.Controllers
         /// <summary>
         /// Gets a specific model item by its model ID and item ID.
         /// </summary>
-        /// <param name="modelid">The unique identifier of the model.</param>
-        /// <param name="modelitemid">The unique identifier of the model item.</param>
+        /// <param name="modelid">The ID of the model.</param>
+        /// <param name="modelitemid">The ID of the model item.</param>
         /// <returns>Returns a <see cref="ModelItemGetDTO"/> representing the model item.</returns>
         [HttpGet("{modelid}/{modelitemid}")]
         public ActionResult<ModelItemGetDTO> GetById(Guid modelid, Guid modelitemid)
@@ -89,7 +89,7 @@ namespace PostgisAPI.Controllers
         /// <summary>
         /// Create a new model item for a specific model.
         /// </summary>
-        /// <param name="modelid">The unique identifier of the model.</param>
+        /// <param name="modelid">The ID of the model.</param>
         /// <param name="modelItemDTO">The data to create the new model item.</param>
         /// <returns>Returns the created <see cref="ModelItem"/>.</returns>
         [HttpPost("{modelid}")]
@@ -114,6 +114,61 @@ namespace PostgisAPI.Controllers
             context.SaveChanges();
 
             return modelItem;
+        }
+
+        /// <summary>
+        /// Gets a list of model items of a specific model that contain a given hit point.
+        /// </summary>
+        /// <param name="modelid">The ID of the model.</param>
+        /// <param name="hitPoint">The hit point to check for containment.</param>
+        /// <returns>Returns a list of <see cref="ModelItemGetDTO"/> representing the model items containing the hit point.</returns>
+        [HttpPost("{modelid}/hitpoint")]
+        public ActionResult<IEnumerable<ModelItemGetDTO>> GetByHitPoint(Guid modelid, PointZ hitPoint)
+        {
+            IEnumerable<ModelItemGetDTO> modelItems = context.ModelItems.Where(item => item.ModelID == modelid && item.Contains(hitPoint)).Select(item => new ModelItemGetDTO
+            {
+                ModelID = item.ModelID,
+                ModelItemID = item.ModelItemID,
+                HierarchyIndex = item.HierarchyIndex,
+                DisplayName = item.DisplayName,
+                Path = item.Path,
+                Color = JsonConvert.DeserializeObject<Color>(item.Color),
+                Mesh = JsonConvert.DeserializeObject<Mesh>(item.Mesh),
+                Matrix = item.Matrix,
+                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(item.AABB),
+                BatchedModelItemID = item.BatchedModelItemID,
+                Properties = item.Properties,
+                LastModifiedTime = item.LastModifiedTime
+            });
+            return modelItems.ToList();
+        }
+
+        /// <summary>
+        /// Gets a list of model items for a specific model and batched model item ID.
+        /// </summary>
+        /// <param name="modelid">The ID of the model.</param>
+        /// <param name="batchedmodelitemid">The ID of the batched model item.</param>
+        /// <returns>Returns a list of <see cref="ModelItemGetDTO"/> representing the model items for the specified batched model item.</returns>
+        [HttpGet("{modelid}/{batchedmodelitemid}")]
+        public ActionResult<IEnumerable<ModelItemGetDTO>> GetByBatchedModelItem(Guid modelid, Guid batchedmodelitemid)
+        {
+            IEnumerable<ModelItemGetDTO> modelItemsDTO = context.ModelItems.Where(item => item.ModelID == modelid && item.BatchedModelItemID == batchedmodelitemid).Select(item => new ModelItemGetDTO
+            {
+                ModelID = item.ModelID,
+                ModelItemID = item.ModelItemID,
+                HierarchyIndex = item.HierarchyIndex,
+                DisplayName = item.DisplayName,
+                Path = item.Path,
+                Color = JsonConvert.DeserializeObject<Color>(item.Color),
+                Mesh = JsonConvert.DeserializeObject<Mesh>(item.Mesh),
+                Matrix = item.Matrix,
+                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(item.AABB),
+                BatchedModelItemID = item.BatchedModelItemID,
+                Properties = item.Properties,
+                LastModifiedTime = item.LastModifiedTime
+            });
+
+            return modelItemsDTO.ToList();
         }
     }
 }

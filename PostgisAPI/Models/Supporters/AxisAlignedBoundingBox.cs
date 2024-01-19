@@ -1,14 +1,26 @@
-﻿namespace PostgisAPI.Models.Supporters
+﻿using NetTopologySuite.Geometries;
+using PostgisUltilities;
+
+namespace PostgisAPI.Models.Supporters
 {
     public class AxisAlignedBoundingBox
     {
-        public Point? MinPoint { get; set; }
-        public Point? MaxPoint { get; set; }
+        public PointZ? MinPoint { get; set; }
+        public PointZ? MaxPoint { get; set; }
         public AxisAlignedBoundingBox()
         {
-            MinPoint = new Point();
-            MaxPoint = new Point();
+            MinPoint = new PointZ();
+            MaxPoint = new PointZ();
         }
 
+        public bool Contains(PointZ point)
+        {
+            Point minPoint = MinPoint.AsGeometry();
+            Point maxPoint = MaxPoint.AsGeometry();
+
+            PostgisUltilities.AxisAlignedBoundingBox aabb = new PostgisUltilities.AxisAlignedBoundingBox(minPoint, maxPoint);
+
+            return aabb.Contains(point.AsGeometry());
+        }
     }
 }

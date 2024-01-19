@@ -2,11 +2,11 @@
 {
     public class Mesh
     {
-        public List<Point> vertices { get; set; }
+        public List<PointZ> vertices { get; set; }
         public List<int> faceIndexes { get; set; }
         public Mesh()
         {
-            vertices = new List<Point>();
+            vertices = new List<PointZ>();
             faceIndexes = new List<int>();
         }
     }

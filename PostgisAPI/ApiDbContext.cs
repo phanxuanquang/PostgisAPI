@@ -9,6 +9,7 @@ namespace PostgisAPI
     public class ApiDbContext : DbContext
     {
         public DbSet<ModelItem> ModelItems { get; set; }
+        public DbSet<Model> Models { get; set; }
 
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
 

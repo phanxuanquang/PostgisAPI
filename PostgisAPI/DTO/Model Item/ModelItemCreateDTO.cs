@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using PostgisAPI.Models;
-using PostgisAPI.Models.Supporters;
+﻿using PostgisAPI.Models.Supporters;
 
 namespace PostgisAPI.DTO
 {

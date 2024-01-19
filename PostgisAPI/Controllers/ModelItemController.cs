@@ -3,20 +3,32 @@ using Newtonsoft.Json;
 using PostgisAPI.DTO;
 using PostgisAPI.Models;
 using PostgisAPI.Models.Supporters;
-using System.Reflection;
 
 namespace PostgisAPI.Controllers
 {
+    /// <summary>
+    /// Controller for model item management
+    /// </summary>
     [ApiController]
     [Route("modelitem")]
     public class ModelItemController : ControllerBase
     {
         private readonly ApiDbContext context;
 
+        /// <summary>
+        /// Initialize a controller for model item
+        /// </summary>
+        /// <param name="dbContext"></param>
         public ModelItemController(ApiDbContext dbContext)
         {
             context = dbContext;
         }
+
+        /// <summary>
+        /// Get a list of model items for a specific model.
+        /// </summary>
+        /// <param name="modelid">The unique identifier of the model.</param>
+        /// <returns>Returns a list of <see cref="ModelItemGetDTO"/> representing the model items.</returns>
         [HttpGet("{modelid}")]
         public ActionResult<IEnumerable<ModelItemGetDTO>> Get(Guid modelid)
         {
@@ -38,6 +50,13 @@ namespace PostgisAPI.Controllers
 
             return modelItemsDTO.ToList();
         }
+
+        /// <summary>
+        /// Gets a specific model item by its model ID and item ID.
+        /// </summary>
+        /// <param name="modelid">The unique identifier of the model.</param>
+        /// <param name="modelitemid">The unique identifier of the model item.</param>
+        /// <returns>Returns a <see cref="ModelItemGetDTO"/> representing the model item.</returns>
         [HttpGet("{modelid}/{modelitemid}")]
         public ActionResult<ModelItemGetDTO> GetById(Guid modelid, Guid modelitemid)
         {
@@ -66,6 +85,13 @@ namespace PostgisAPI.Controllers
 
             return modelItemDTO;
         }
+
+        /// <summary>
+        /// Create a new model item for a specific model.
+        /// </summary>
+        /// <param name="modelid">The unique identifier of the model.</param>
+        /// <param name="modelItemDTO">The data to create the new model item.</param>
+        /// <returns>Returns the created <see cref="ModelItem"/>.</returns>
         [HttpPost("{modelid}")]
         public ActionResult<ModelItem> Post(Guid modelid, ModelItemCreateDTO modelItemDTO)
         {

@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Reflection.Emit;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
 using PostgisAPI.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace PostgisAPI
 {

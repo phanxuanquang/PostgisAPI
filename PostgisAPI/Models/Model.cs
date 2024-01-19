@@ -9,7 +9,7 @@ namespace PostgisAPI.Models
         public int ID { get; set; }
         [Column("modelid")]
         public Guid ModelID { get; set; } = Guid.NewGuid();
-        [Column("name")]
+        [Column("displayname")]
         public string? DisplayName { get; set; }
         [Column("aabb", TypeName = "jsonb")]
         public string? AABB { get; set; }

@@ -33,7 +33,7 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<ModelGetDTO>))]
         public ActionResult<IEnumerable<ModelGetDTO>> Get()
         {
-            IEnumerable<ModelGetDTO> models = context.ModelItems.Select(item => new ModelGetDTO
+            IEnumerable<ModelGetDTO> models = context.Models.Select(item => new ModelGetDTO
             {
                 ModelID = item.ModelID,
                 DisplayName = item.DisplayName,
@@ -56,7 +56,7 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(404)]
         public ActionResult<ModelGetDTO> GetById(Guid modelid)
         {
-            ModelItem? model = context.ModelItems.FirstOrDefault(item => item.ModelID == modelid);
+            Model? model = context.Models.FirstOrDefault(item => item.ModelID == modelid);
 
             if (model == null)
             {

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostgisAPI", "PostgisAPI\Po
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostgisUltilities", "PostgisUltilities\PostgisUltilities.csproj", "{219EACCD-734A-431C-90E4-18B1D391998B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiTester", "ApiTester\ApiTester.csproj", "{B8B8A04B-A4A9-499E-8465-67E894263CF7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{219EACCD-734A-431C-90E4-18B1D391998B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{219EACCD-734A-431C-90E4-18B1D391998B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{219EACCD-734A-431C-90E4-18B1D391998B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8B8A04B-A4A9-499E-8465-67E894263CF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8B8A04B-A4A9-499E-8465-67E894263CF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8B8A04B-A4A9-499E-8465-67E894263CF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8B8A04B-A4A9-499E-8465-67E894263CF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

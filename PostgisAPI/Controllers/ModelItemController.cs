@@ -170,5 +170,40 @@ namespace PostgisAPI.Controllers
 
             return modelItemsDTO.ToList();
         }
+
+        /// <summary>
+        /// Gets a specific model item by its model ID and hierarchy index.
+        /// </summary>
+        /// <param name="modelid">The ID of the model.</param>
+        /// <param name="hierachyindex">The hierarchy index of the model item.</param>
+        /// <returns>Returns a <see cref="ModelItemGetDTO"/> representing the model item.</returns>
+        [HttpGet("{modelid}/{hierachyindex}")]
+        public ActionResult<ModelItemGetDTO> GetByHierachyIndex(Guid modelid, int hierachyindex)
+        {
+            ModelItem? modelItem = context.ModelItems.FirstOrDefault(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+
+            if (modelItem == null)
+            {
+                return NotFound();
+            }
+
+            ModelItemGetDTO modelItemDTO = new ModelItemGetDTO
+            {
+                ModelID = modelItem.ModelID,
+                ModelItemID = modelItem.ModelItemID,
+                HierarchyIndex = modelItem.HierarchyIndex,
+                DisplayName = modelItem.DisplayName,
+                Path = modelItem.Path,
+                Color = JsonConvert.DeserializeObject<Color>(modelItem.Color),
+                Mesh = JsonConvert.DeserializeObject<Mesh>(modelItem.Mesh),
+                Matrix = modelItem.Matrix,
+                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(modelItem.AABB),
+                BatchedModelItemID = modelItem.BatchedModelItemID,
+                Properties = modelItem.Properties,
+                LastModifiedTime = modelItem.LastModifiedTime
+            };
+
+            return modelItemDTO;
+        }
     }
 }

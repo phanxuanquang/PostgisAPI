@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using PostgisAPI.DTO;
 using PostgisAPI.Models;
+using PostgisAPI.Models.Supporters;
 using System.Reflection;
 
 namespace PostgisAPI.Controllers
@@ -17,12 +18,12 @@ namespace PostgisAPI.Controllers
             context = dbContext;
         }
         [HttpGet("{modelid}")]
-        public ActionResult<IEnumerable<ModelItemDTO>> Get(Guid modelid)
+        public ActionResult<IEnumerable<ModelItemGetDTO>> Get(Guid modelid)
         {
-            IEnumerable<ModelItemDTO> modelItemsDTO = context.ModelItems.Where(item => item.ModelID == modelid).Select(item => new ModelItemDTO
+            IEnumerable<ModelItemGetDTO> modelItemsDTO = context.ModelItems.Where(item => item.ModelID == modelid).Select(item => new ModelItemGetDTO
             {
-                RowIndex = item.ID,
                 ModelID = item.ModelID,
+                ModelItemID = item.ModelItemID,
                 HierarchyIndex = item.HierarchyIndex,
                 DisplayName = item.DisplayName,
                 Path = item.Path,
@@ -38,7 +39,7 @@ namespace PostgisAPI.Controllers
             return modelItemsDTO.ToList();
         }
         [HttpGet("{modelid}/{modelitemid}")]
-        public ActionResult<ModelItemDTO> GetById(Guid modelid, Guid modelitemid)
+        public ActionResult<ModelItemGetDTO> GetById(Guid modelid, Guid modelitemid)
         {
             ModelItem? modelItem = context.ModelItems.FirstOrDefault(item => item.ModelID == modelid && item.ModelItemID == modelitemid);
 
@@ -47,10 +48,10 @@ namespace PostgisAPI.Controllers
                 return NotFound();
             }
 
-            ModelItemDTO modelItemDTO = new ModelItemDTO
+            ModelItemGetDTO modelItemDTO = new ModelItemGetDTO
             {
-                RowIndex = modelItem.ID,
                 ModelID = modelItem.ModelID,
+                ModelItemID = modelItem.ModelItemID,
                 HierarchyIndex = modelItem.HierarchyIndex,
                 DisplayName = modelItem.DisplayName,
                 Path = modelItem.Path,

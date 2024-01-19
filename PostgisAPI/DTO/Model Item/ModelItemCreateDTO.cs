@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using PostgisAPI.Models;
+using PostgisAPI.Models.Supporters;
 
 namespace PostgisAPI.DTO
 {
@@ -15,6 +16,5 @@ namespace PostgisAPI.DTO
         public AxisAlignedBoundingBox? AABB { get; set; }
         public Guid BatchedModelItemID { get; set; }
         public string? Properties { get; set; }
-        public DateTime LastModifiedTime { get; set; }
     }
 }

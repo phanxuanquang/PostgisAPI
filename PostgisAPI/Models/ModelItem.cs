@@ -36,7 +36,7 @@ namespace PostgisAPI.Models
         public string? AABB { get; set; }
         [Column("batchedmodelitemid")]
         public Guid? BatchedModelItemID { get; set; }
-        [Column("properties", TypeName = "jsonb")]
+        [Column("properties")]
         public string Properties { get; set; }
         [Column("lastmodifiedtime")]
         public DateTime LastModifiedTime { get; set; } = DateTime.Now;

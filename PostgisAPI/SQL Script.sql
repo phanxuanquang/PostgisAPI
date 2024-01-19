@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS ModelItem (
 	Mesh JSONB,
 	Matrix REAL[],
 	aabb JSONB DEFAULT NULL,
-    Properties JSONB,
+    Properties TEXT,
 	LastModifiedTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	ModelID UUID REFERENCES Model(ModelID) NOT NULL,
     BatchedModelItemID UUID REFERENCES ModelItem(ModelItemID) DEFAULT NULL

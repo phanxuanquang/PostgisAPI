@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostgisAPI", "PostgisAPI\PostgisAPI.csproj", "{E7511F92-3D5B-44B8-8A95-884AF362E7C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostgisAPI", "PostgisAPI\PostgisAPI.csproj", "{E7511F92-3D5B-44B8-8A95-884AF362E7C5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostgisUltilities", "PostgisUltilities\PostgisUltilities.csproj", "{219EACCD-734A-431C-90E4-18B1D391998B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiTester", "ApiTester\ApiTester.csproj", "{B8B8A04B-A4A9-499E-8465-67E894263CF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		{219EACCD-734A-431C-90E4-18B1D391998B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{219EACCD-734A-431C-90E4-18B1D391998B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{219EACCD-734A-431C-90E4-18B1D391998B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B8B8A04B-A4A9-499E-8465-67E894263CF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B8B8A04B-A4A9-499E-8465-67E894263CF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B8B8A04B-A4A9-499E-8465-67E894263CF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B8B8A04B-A4A9-499E-8465-67E894263CF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -108,7 +108,6 @@
   <ItemGroup>
     <Compile Include="Bounding Boxes\AxisAlignedBoundingBox.cs" />
     <Compile Include="GeometryHelper.cs" />
-    <Compile Include="ModelItemApiHelper.cs" />
     <Compile Include="Models\ModelItemDB.cs" />
     <Compile Include="Bounding Boxes\OrientedBoundingBox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

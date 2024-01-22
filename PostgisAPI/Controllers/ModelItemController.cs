@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Index.HPRtree;
 using Newtonsoft.Json;
 using PostgisAPI.DTO;
 using PostgisAPI.Models;
@@ -75,7 +74,7 @@ namespace PostgisAPI.Controllers
         [HttpPost("{modelid}")]
         public ActionResult<ModelItem> Create(Guid modelid, ModelItemCreateDTO modelItemDTO)
         {
-            var modelItem = modelItemDTO.AsModelDB(modelid);
+            ModelItem modelItem = modelItemDTO.AsModelDB(modelid);
 
             context.ModelItems.Add(modelItem);
             context.SaveChanges();
@@ -116,12 +115,12 @@ namespace PostgisAPI.Controllers
                 .Where(item => item.ModelID == modelid && item.BatchedModelItemID == batchedmodelitemid)
                 .Select(item => item.AsDTO());
 
-            if (modelItems.Any() )
+            if (modelItems.Any())
             {
                 return modelItems.ToList();
             }
             return NotFound();
-            
+
         }
 
         /// <summary>
@@ -133,7 +132,7 @@ namespace PostgisAPI.Controllers
         [HttpPost("{modelid}/hierachyindex")]
         public ActionResult<ModelItemGetDTO> GetByHierachyIndex(Guid modelid, int hierachyindex)
         {
-            var modelItem = context.ModelItems
+            ModelItem? modelItem = context.ModelItems
                 .FirstOrDefault(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)
@@ -152,7 +151,7 @@ namespace PostgisAPI.Controllers
         [HttpPut("{modelid}/{hierachyindex}")]
         public async Task<IActionResult> Update(Guid modelid, int hierachyindex, [FromBody] ModelItemCreateDTO modelItemDTO)
         {
-            var modelItem = await context.ModelItems
+            ModelItem? modelItem = await context.ModelItems
                 .FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)
@@ -185,7 +184,7 @@ namespace PostgisAPI.Controllers
         [HttpDelete("{modelid}/{hierachyindex}")]
         public async Task<IActionResult> Delete(Guid modelid, int hierachyindex)
         {
-            var modelItem = await context.ModelItems
+            ModelItem? modelItem = await context.ModelItems
                 .FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)

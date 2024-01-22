@@ -52,19 +52,19 @@ namespace PostgisAPI.Models
         {
             return new ModelItemGetDTO
             {
-                ModelID = this.ModelID,
-                ModelItemID = this.ModelItemID,
-                HierarchyIndex = this.HierarchyIndex,
-                ParentHierachyIndex = this.ParentHierachyIndex,
-                DisplayName = this.DisplayName,
-                Path = this.Path,
-                Color = JsonConvert.DeserializeObject<Color>(this.Color),
-                Mesh = JsonConvert.DeserializeObject<Mesh>(this.Mesh),
-                Matrix = this.Matrix,
-                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(this.AABB),
-                BatchedModelItemID = this.BatchedModelItemID,
-                Properties = this.Properties,
-                LastModifiedTime = this.LastModifiedTime
+                ModelID = ModelID,
+                ModelItemID = ModelItemID,
+                HierarchyIndex = HierarchyIndex,
+                ParentHierachyIndex = ParentHierachyIndex,
+                DisplayName = DisplayName,
+                Path = Path,
+                Color = JsonConvert.DeserializeObject<Color>(Color),
+                Mesh = JsonConvert.DeserializeObject<Mesh>(Mesh),
+                Matrix = Matrix,
+                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(AABB),
+                BatchedModelItemID = BatchedModelItemID,
+                Properties = Properties,
+                LastModifiedTime = LastModifiedTime
             };
         }
     }

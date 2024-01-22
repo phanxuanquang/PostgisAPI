@@ -1,4 +1,7 @@
-﻿namespace PostgisAPI.DTO.Model
+﻿using Newtonsoft.Json;
+using PostgisAPI.Models;
+
+namespace PostgisAPI.DTO.Model
 {
     public class ModelGetDTO : ModelCreateDTO
     {

@@ -34,24 +34,16 @@ namespace PostgisAPI.Controllers
         [HttpGet("{modelid}")]
         public ActionResult<IEnumerable<ModelItemGetDTO>> GetAll(Guid modelid)
         {
-            IEnumerable<ModelItemGetDTO> modelItemsDTO = context.ModelItems.Where(item => item.ModelID == modelid).Select(item => new ModelItemGetDTO
-            {
-                ModelID = item.ModelID,
-                ModelItemID = item.ModelItemID,
-                HierarchyIndex = item.HierarchyIndex,
-                ParentHierachyIndex = item.ParentHierachyIndex,
-                DisplayName = item.DisplayName,
-                Path = item.Path,
-                Color = JsonConvert.DeserializeObject<Color>(item.Color),
-                Mesh = JsonConvert.DeserializeObject<Mesh>(item.Mesh),
-                Matrix = item.Matrix,
-                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(item.AABB),
-                BatchedModelItemID = item.BatchedModelItemID,
-                Properties = item.Properties,
-                LastModifiedTime = item.LastModifiedTime
-            });
+            IEnumerable<ModelItemGetDTO> modelItemsDTO = context.ModelItems
+                .Where(item => item.ModelID == modelid)
+                .Select(item => item.AsDTO());
 
-            return modelItemsDTO.ToList();
+            if (modelItemsDTO.Any())
+            {
+                return modelItemsDTO.ToList();
+            }
+
+            return NotFound();
         }
 
         /// <summary>
@@ -63,31 +55,15 @@ namespace PostgisAPI.Controllers
         [HttpGet("{modelid}/{modelitemid}")]
         public ActionResult<ModelItemGetDTO> GetById(Guid modelid, Guid modelitemid)
         {
-            ModelItem? modelItem = context.ModelItems.FirstOrDefault(item => item.ModelID == modelid && item.ModelItemID == modelitemid);
+            ModelItem? modelItem = context.ModelItems
+                .FirstOrDefault(item => item.ModelID == modelid && item.ModelItemID == modelitemid);
 
             if (modelItem == null)
             {
                 return NotFound();
             }
 
-            ModelItemGetDTO modelItemDTO = new ModelItemGetDTO
-            {
-                ModelID = modelItem.ModelID,
-                ModelItemID = modelItem.ModelItemID,
-                HierarchyIndex = modelItem.HierarchyIndex,
-                ParentHierachyIndex = modelItem.ParentHierachyIndex,
-                DisplayName = modelItem.DisplayName,
-                Path = modelItem.Path,
-                Color = JsonConvert.DeserializeObject<Color>(modelItem.Color),
-                Mesh = JsonConvert.DeserializeObject<Mesh>(modelItem.Mesh),
-                Matrix = modelItem.Matrix,
-                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(modelItem.AABB),
-                BatchedModelItemID = modelItem.BatchedModelItemID,
-                Properties = modelItem.Properties,
-                LastModifiedTime = modelItem.LastModifiedTime
-            };
-
-            return modelItemDTO;
+            return modelItem.AsDTO();
         }
 
         /// <summary>
@@ -99,21 +75,7 @@ namespace PostgisAPI.Controllers
         [HttpPost("{modelid}")]
         public ActionResult<ModelItem> Create(Guid modelid, ModelItemCreateDTO modelItemDTO)
         {
-            ModelItem modelItem = new ModelItem
-            {
-                ModelItemID = Guid.NewGuid(),
-                HierarchyIndex = modelItemDTO.HierarchyIndex,
-                ParentHierachyIndex = modelItemDTO.ParentHierachyIndex,
-                ModelID = modelid,
-                BatchedModelItemID = modelItemDTO.BatchedModelItemID,
-                DisplayName = modelItemDTO.DisplayName,
-                Path = modelItemDTO.Path,
-                Color = JsonConvert.SerializeObject(modelItemDTO.Color),
-                Matrix = modelItemDTO.Matrix,
-                AABB = JsonConvert.SerializeObject(modelItemDTO.AABB),
-                Mesh = JsonConvert.SerializeObject(modelItemDTO.Mesh),
-                Properties = modelItemDTO.Properties
-            };
+            var modelItem = modelItemDTO.AsModelDB(modelid);
 
             context.ModelItems.Add(modelItem);
             context.SaveChanges();
@@ -130,23 +92,15 @@ namespace PostgisAPI.Controllers
         [HttpPost("{modelid}/hitpoint")]
         public ActionResult<IEnumerable<ModelItemGetDTO>> GetByHitPoint(Guid modelid, PointZ hitPoint)
         {
-            IEnumerable<ModelItemGetDTO> modelItems = context.ModelItems.Where(item => item.ModelID == modelid && item.Contains(hitPoint)).Select(item => new ModelItemGetDTO
+            IEnumerable<ModelItemGetDTO> modelItems = context.ModelItems
+                .Where(item => item.ModelID == modelid && item.Contains(hitPoint))
+                .Select(item => item.AsDTO());
+
+            if (modelItems.Any())
             {
-                ModelID = item.ModelID,
-                ModelItemID = item.ModelItemID,
-                HierarchyIndex = item.HierarchyIndex,
-                ParentHierachyIndex = item.ParentHierachyIndex,
-                DisplayName = item.DisplayName,
-                Path = item.Path,
-                Color = JsonConvert.DeserializeObject<Color>(item.Color),
-                Mesh = JsonConvert.DeserializeObject<Mesh>(item.Mesh),
-                Matrix = item.Matrix,
-                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(item.AABB),
-                BatchedModelItemID = item.BatchedModelItemID,
-                Properties = item.Properties,
-                LastModifiedTime = item.LastModifiedTime
-            });
-            return modelItems.ToList();
+                return modelItems.ToList();
+            }
+            return NotFound();
         }
 
         /// <summary>
@@ -158,22 +112,9 @@ namespace PostgisAPI.Controllers
         [HttpPost("{modelid}/batchedmodelitem")]
         public ActionResult<IEnumerable<ModelItemGetDTO>> GetByBatchedModelItem(Guid modelid, Guid batchedmodelitemid)
         {
-            IEnumerable<ModelItemGetDTO> modelItems = context.ModelItems.Where(item => item.ModelID == modelid && item.BatchedModelItemID == batchedmodelitemid).Select(item => new ModelItemGetDTO
-            {
-                ModelID = item.ModelID,
-                ModelItemID = item.ModelItemID,
-                HierarchyIndex = item.HierarchyIndex,
-                ParentHierachyIndex = item.ParentHierachyIndex,
-                DisplayName = item.DisplayName,
-                Path = item.Path,
-                Color = JsonConvert.DeserializeObject<Color>(item.Color),
-                Mesh = JsonConvert.DeserializeObject<Mesh>(item.Mesh),
-                Matrix = item.Matrix,
-                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(item.AABB),
-                BatchedModelItemID = item.BatchedModelItemID,
-                Properties = item.Properties,
-                LastModifiedTime = item.LastModifiedTime
-            });
+            IEnumerable<ModelItemGetDTO> modelItems = context.ModelItems
+                .Where(item => item.ModelID == modelid && item.BatchedModelItemID == batchedmodelitemid)
+                .Select(item => item.AsDTO());
 
             if (modelItems.Any() )
             {
@@ -192,31 +133,14 @@ namespace PostgisAPI.Controllers
         [HttpPost("{modelid}/hierachyindex")]
         public ActionResult<ModelItemGetDTO> GetByHierachyIndex(Guid modelid, int hierachyindex)
         {
-            var modelItem = context.ModelItems.FirstOrDefault(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+            var modelItem = context.ModelItems
+                .FirstOrDefault(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)
             {
                 return NotFound();
             }
-
-            ModelItemGetDTO modelItemDTO = new ModelItemGetDTO
-            {
-                ModelID = modelItem.ModelID,
-                ModelItemID = modelItem.ModelItemID,
-                HierarchyIndex = modelItem.HierarchyIndex,
-                ParentHierachyIndex = modelItem.ParentHierachyIndex,
-                DisplayName = modelItem.DisplayName,
-                Path = modelItem.Path,
-                Color = JsonConvert.DeserializeObject<Color>(modelItem.Color),
-                Mesh = JsonConvert.DeserializeObject<Mesh>(modelItem.Mesh),
-                Matrix = modelItem.Matrix,
-                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(modelItem.AABB),
-                BatchedModelItemID = modelItem.BatchedModelItemID,
-                Properties = modelItem.Properties,
-                LastModifiedTime = modelItem.LastModifiedTime
-            };
-
-            return modelItemDTO;
+            return modelItem.AsDTO();
         }
 
         /// <summary>
@@ -228,7 +152,8 @@ namespace PostgisAPI.Controllers
         [HttpPut("{modelid}/{hierachyindex}")]
         public async Task<IActionResult> Update(Guid modelid, int hierachyindex, [FromBody] ModelItemCreateDTO modelItemDTO)
         {
-            var modelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+            var modelItem = await context.ModelItems
+                .FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)
             {
@@ -260,7 +185,8 @@ namespace PostgisAPI.Controllers
         [HttpDelete("{modelid}/{hierachyindex}")]
         public async Task<IActionResult> Delete(Guid modelid, int hierachyindex)
         {
-            var modelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+            var modelItem = await context.ModelItems
+                .FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)
             {

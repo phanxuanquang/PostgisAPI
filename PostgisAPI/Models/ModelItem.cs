@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using PostgisAPI.DTO;
 using PostgisAPI.Models.Supporters;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -45,6 +46,26 @@ namespace PostgisAPI.Models
         {
             AxisAlignedBoundingBox aabb = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(AABB);
             return aabb.Contains(point);
+        }
+
+        public ModelItemGetDTO AsDTO()
+        {
+            return new ModelItemGetDTO
+            {
+                ModelID = this.ModelID,
+                ModelItemID = this.ModelItemID,
+                HierarchyIndex = this.HierarchyIndex,
+                ParentHierachyIndex = this.ParentHierachyIndex,
+                DisplayName = this.DisplayName,
+                Path = this.Path,
+                Color = JsonConvert.DeserializeObject<Color>(this.Color),
+                Mesh = JsonConvert.DeserializeObject<Mesh>(this.Mesh),
+                Matrix = this.Matrix,
+                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(this.AABB),
+                BatchedModelItemID = this.BatchedModelItemID,
+                Properties = this.Properties,
+                LastModifiedTime = this.LastModifiedTime
+            };
         }
     }
 }

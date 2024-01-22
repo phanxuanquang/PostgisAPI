@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Index.HPRtree;
 using Newtonsoft.Json;
 using PostgisAPI.DTO;
@@ -54,7 +55,7 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Gets a specific model item by its model ID and item ID.
+        /// Gets a specific model item by its model item ID.
         /// </summary>
         /// <param name="modelid">The ID of the model.</param>
         /// <param name="modelitemid">The ID of the model item.</param>
@@ -154,10 +155,10 @@ namespace PostgisAPI.Controllers
         /// <param name="modelid">The ID of the model.</param>
         /// <param name="batchedmodelitemid">The ID of the batched model item.</param>
         /// <returns>Returns a list of <see cref="ModelItemGetDTO"/> representing the model items for the specified batched model item.</returns>
-        [HttpGet("{modelid}/{batchedmodelitemid}")]
+        [HttpPost("{modelid}/batchedmodelitem")]
         public ActionResult<IEnumerable<ModelItemGetDTO>> GetByBatchedModelItem(Guid modelid, Guid batchedmodelitemid)
         {
-            IEnumerable<ModelItemGetDTO> modelItemsDTO = context.ModelItems.Where(item => item.ModelID == modelid && item.BatchedModelItemID == batchedmodelitemid).Select(item => new ModelItemGetDTO
+            IEnumerable<ModelItemGetDTO> modelItems = context.ModelItems.Where(item => item.ModelID == modelid && item.BatchedModelItemID == batchedmodelitemid).Select(item => new ModelItemGetDTO
             {
                 ModelID = item.ModelID,
                 ModelItemID = item.ModelItemID,
@@ -174,7 +175,12 @@ namespace PostgisAPI.Controllers
                 LastModifiedTime = item.LastModifiedTime
             });
 
-            return modelItemsDTO.ToList();
+            if (modelItems.Any() )
+            {
+                return modelItems.ToList();
+            }
+            return NotFound();
+            
         }
 
         /// <summary>
@@ -183,10 +189,10 @@ namespace PostgisAPI.Controllers
         /// <param name="modelid">The ID of the model.</param>
         /// <param name="hierachyindex">The hierarchy index of the model item.</param>
         /// <returns>Returns a <see cref="ModelItemGetDTO"/> representing the model item.</returns>
-        [HttpGet("{modelid}/{hierachyindex}")]
+        [HttpPost("{modelid}/hierachyindex")]
         public ActionResult<ModelItemGetDTO> GetByHierachyIndex(Guid modelid, int hierachyindex)
         {
-            ModelItem? modelItem = context.ModelItems.FirstOrDefault(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+            var modelItem = context.ModelItems.FirstOrDefault(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)
             {
@@ -211,6 +217,60 @@ namespace PostgisAPI.Controllers
             };
 
             return modelItemDTO;
+        }
+
+        /// <summary>
+        /// Update a model item by its hierachy index
+        /// </summary>
+        /// <param name="hierachyindex">Hierachy index of the model item</param>
+        /// <param name="modelItemDTO"></param>
+        /// <returns></returns>
+        [HttpPut("{modelid}/{hierachyindex}")]
+        public async Task<IActionResult> Update(Guid modelid, int hierachyindex, [FromBody] ModelItemCreateDTO modelItemDTO)
+        {
+            var modelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+
+            if (modelItem == null)
+            {
+                return NotFound();
+            }
+
+            modelItem.HierarchyIndex = modelItemDTO.HierarchyIndex;
+            modelItem.ParentHierachyIndex = modelItemDTO.ParentHierachyIndex;
+            modelItem.DisplayName = modelItemDTO.DisplayName;
+            modelItem.Path = modelItemDTO.Path;
+            modelItem.Color = JsonConvert.SerializeObject(modelItemDTO.Color);
+            modelItem.Mesh = JsonConvert.SerializeObject(modelItemDTO.Mesh);
+            modelItem.Matrix = modelItemDTO.Matrix;
+            modelItem.AABB = JsonConvert.SerializeObject(modelItemDTO.AABB);
+            modelItem.BatchedModelItemID = modelItemDTO.BatchedModelItemID;
+            modelItem.Properties = modelItemDTO.Properties;
+            modelItem.LastModifiedTime = DateTime.Now;
+
+            await context.SaveChangesAsync();
+            return Ok("Update successfully");
+        }
+
+        /// <summary>
+        /// Delete a model item by its hierachy index
+        /// </summary>
+        /// <param name="modelid">The ID of the model</param>
+        /// <param name="hierachyindex">The hierachy index of the model item</param>
+        /// <returns></returns>
+        [HttpDelete("{modelid}/{hierachyindex}")]
+        public async Task<IActionResult> Delete(Guid modelid, int hierachyindex)
+        {
+            var modelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+
+            if (modelItem == null)
+            {
+                return NotFound();
+            }
+
+            context.ModelItems.Remove(modelItem);
+            await context.SaveChangesAsync();
+
+            return Ok("Delete successfully");
         }
     }
 }

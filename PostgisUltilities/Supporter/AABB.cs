@@ -2,6 +2,9 @@
 
 namespace PostgisUltilities
 {
+    /// <summary>
+    /// The axis-aligned bounding box (AABB) of the model item in the database
+    /// </summary>
     public class AABB
     {
         public Point MinPoint { get; set; }

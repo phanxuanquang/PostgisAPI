@@ -11,12 +11,12 @@ namespace PostgisUltilities
         /// <summary>
         /// Gets or sets the minimum point of the axis-aligned bounding box.
         /// </summary>
-        public Point MinPoint { get; set; }
+        public NetTopologySuite.Geometries.Point MinPoint { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum point of the axis-aligned bounding box.
         /// </summary>
-        public Point MaxPoint { get; set; }
+        public NetTopologySuite.Geometries.Point MaxPoint { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the AxisAlignedBoundingBox class based on the provided geometry.
@@ -27,7 +27,7 @@ namespace PostgisUltilities
             MinPoint = GetMinPoint(geometry);
             MaxPoint = GetMaxPoint(geometry);
         }
-        public AxisAlignedBoundingBox(Point MinPoint, Point MaxPoint)
+        public AxisAlignedBoundingBox(NetTopologySuite.Geometries.Point MinPoint, NetTopologySuite.Geometries.Point MaxPoint)
         {
             this.MinPoint = MinPoint;
             this.MaxPoint = MaxPoint;
@@ -81,7 +81,7 @@ namespace PostgisUltilities
 
             return geometryFactory.CreatePolygon(linearRing);
         }
-        private Point GetMaxPoint(Geometry geometry)
+        private NetTopologySuite.Geometries.Point GetMaxPoint(Geometry geometry)
         {
             double xMax = geometry.Coordinate.X;
             double yMax = geometry.Coordinate.Y;
@@ -103,9 +103,9 @@ namespace PostgisUltilities
                 }
             }
 
-            return new Point(xMax, yMax, zMax);
+            return new NetTopologySuite.Geometries.Point(xMax, yMax, zMax);
         }
-        private Point GetMinPoint(Geometry geometry)
+        private NetTopologySuite.Geometries.Point GetMinPoint(Geometry geometry)
         {
             double xMin = geometry.Coordinate.X;
             double yMin = geometry.Coordinate.Y;
@@ -127,13 +127,13 @@ namespace PostgisUltilities
                 }
             }
 
-            return new Point(xMin, yMin, zMin);
+            return new NetTopologySuite.Geometries.Point(xMin, yMin, zMin);
         }
-        private Vector3d AsVector3dFrom(Point point)
+        private Vector3d AsVector3dFrom(NetTopologySuite.Geometries.Point point)
         {
             return new Vector3d(point.X, point.Y, point.Z);
         }
-        public bool Contains(Point point)
+        public bool Contains(NetTopologySuite.Geometries.Point point)
         {
             return AsGeometry().Contains(point);
         }

@@ -15,7 +15,7 @@ namespace PostgisAPI.Models
         public int HierarchyIndex { get; set; }
 
         [Column("modelid")]
-        public Guid ModelID { get; set; } = Guid.NewGuid();
+        public Guid ModelID { get; set; }
 
         [Column("modelitemid")]
         public Guid ModelItemID { get; set; } = Guid.NewGuid();
@@ -42,7 +42,7 @@ namespace PostgisAPI.Models
         [Column("lastmodifiedtime")]
         public DateTime LastModifiedTime { get; set; } = DateTime.Now;
 
-        public bool Contains(PointZ point)
+        public bool Contains(Point point)
         {
             AxisAlignedBoundingBox aabb = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(AABB);
             return aabb.Contains(point);

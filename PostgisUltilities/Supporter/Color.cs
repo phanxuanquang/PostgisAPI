@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace PostgisAPI.Models.Supporters
+namespace PostgisUltilities
 {
     public class Color
     {
@@ -13,7 +13,7 @@ namespace PostgisAPI.Models.Supporters
             r = g = b = a = 0;
         }
 
-        private string AsJson()
+        public string AsJson()
         {
             return JsonConvert.SerializeObject(this);
         }

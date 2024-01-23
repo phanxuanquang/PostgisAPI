@@ -91,7 +91,7 @@ namespace PostgisAPI.Controllers
         /// <param name="hitPoint">The hit point to check for containment.</param>
         /// <returns>Returns a list of <see cref="ModelItemGetDTO"/> representing the model items containing the hit point.</returns>
         [HttpPost("{modelid}/hitpoint")]
-        public ActionResult<IEnumerable<ModelItemGetDTO>> GetByHitPoint(Guid modelid, PointZ hitPoint)
+        public ActionResult<IEnumerable<ModelItemGetDTO>> GetByHitPoint(Guid modelid, Point hitPoint)
         {
             IEnumerable<ModelItemGetDTO> modelItems = context.ModelItems
                 .Where(item => item.ModelID == modelid && item.Contains(hitPoint))
@@ -187,13 +187,13 @@ namespace PostgisAPI.Controllers
         [HttpPatch("{modelid}/{hierachyindex}")]
         public async Task<IActionResult> Patch(Guid modelid, int hierachyindex, [FromBody] JsonPatchDocument<ModelItemCreateDTO> patchDocument)
         {
-            var existingModelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == item.ModelID && item.HierarchyIndex == hierachyindex);
+            ModelItem? existingModelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == item.ModelID && item.HierarchyIndex == hierachyindex);
 
             if (existingModelItem == null)
             {
                 return NotFound();
             }
-            var modelItemDTO = existingModelItem.AsDTO();
+            ModelItemGetDTO modelItemDTO = existingModelItem.AsDTO();
 
             patchDocument.ApplyTo(modelItemDTO, (Microsoft.AspNetCore.JsonPatch.Adapters.IObjectAdapter)ModelState);
 

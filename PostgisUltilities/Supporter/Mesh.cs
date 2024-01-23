@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
-namespace PostgisAPI.Models.Supporters
+namespace PostgisUltilities
 {
     public class Mesh
     {
@@ -11,8 +12,7 @@ namespace PostgisAPI.Models.Supporters
             vertices = new List<Point>();
             faceIndexes = new List<int>();
         }
-
-        private string AsJson()
+        public string AsJson()
         {
             return JsonConvert.SerializeObject(this);
         }

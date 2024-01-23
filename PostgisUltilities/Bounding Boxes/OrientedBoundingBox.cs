@@ -11,9 +11,9 @@ namespace PostgisUltilities
         private Vector3d yAxis;
         private Vector3d zAxis;
         private Vector3d halfSizeVector;
-        private Point AsPointFrom(Vector3d point)
+        private NetTopologySuite.Geometries.Point AsPointFrom(Vector3d point)
         {
-            return new Point(point.x, point.y, point.z);
+            return new NetTopologySuite.Geometries.Point(point.x, point.y, point.z);
         }
         public OrientedBoundingBox(Geometry geometry)
         {
@@ -72,23 +72,23 @@ namespace PostgisUltilities
 
             return geometryFactory.CreatePolygon(linearRing);
         }
-        public Point AxisX()
+        public NetTopologySuite.Geometries.Point AxisX()
         {
             return AsPointFrom(xAxis);
         }
-        public Point AxisY()
+        public NetTopologySuite.Geometries.Point AxisY()
         {
             return AsPointFrom(yAxis);
         }
-        public Point AxisZ()
+        public NetTopologySuite.Geometries.Point AxisZ()
         {
             return AsPointFrom(zAxis);
         }
-        public Point HalfSizeVector()
+        public NetTopologySuite.Geometries.Point HalfSizeVector()
         {
             return AsPointFrom(halfSizeVector);
         }
-        public bool Contains(Point point)
+        public bool Contains(NetTopologySuite.Geometries.Point point)
         {
             return AsGeometry().Contains(point);
         }

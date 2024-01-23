@@ -1,18 +1,17 @@
 ﻿using Newtonsoft.Json;
 
-namespace PostgisAPI.Models.Supporters
+namespace PostgisUltilities
 {
-    public class AxisAlignedBoundingBox
+    public class AABB
     {
-        public Point? MinPoint { get; set; }
-        public Point? MaxPoint { get; set; }
-        public AxisAlignedBoundingBox()
+        public Point MinPoint { get; set; }
+        public Point MaxPoint { get; set; }
+        public AABB()
         {
             MinPoint = new Point();
             MaxPoint = new Point();
         }
-
-        private string AsJson()
+        public string AsJson()
         {
             return JsonConvert.SerializeObject(this);
         }
@@ -21,7 +20,7 @@ namespace PostgisAPI.Models.Supporters
             NetTopologySuite.Geometries.Point minPoint = MinPoint.AsGeometry();
             NetTopologySuite.Geometries.Point maxPoint = MaxPoint.AsGeometry();
 
-            PostgisUltilities.AxisAlignedBoundingBox aabb = new PostgisUltilities.AxisAlignedBoundingBox(minPoint, maxPoint);
+            AxisAlignedBoundingBox aabb = new AxisAlignedBoundingBox(minPoint, maxPoint);
 
             return aabb.Contains(point.AsGeometry());
         }

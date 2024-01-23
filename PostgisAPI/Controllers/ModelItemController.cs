@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using PostgisAPI.DTO;
@@ -172,6 +174,38 @@ namespace PostgisAPI.Controllers
             modelItem.LastModifiedTime = DateTime.Now;
 
             await context.SaveChangesAsync();
+            return Ok("Update successfully");
+        }
+
+        /// <summary>
+        /// Update one or many attribute of a model item
+        /// </summary>
+        /// <param name="modelid">ID of the model</param>
+        /// <param name="hierachyindex">Hierachy index of the model item</param>
+        /// <param name="patchDocument"></param>
+        /// <returns></returns>
+        [HttpPatch("{modelid}/{hierachyindex}")]
+        public async Task<IActionResult> Patch(Guid modelid, int hierachyindex, [FromBody] JsonPatchDocument<ModelItemCreateDTO> patchDocument)
+        {
+            var existingModelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == item.ModelID && item.HierarchyIndex == hierachyindex);
+
+            if (existingModelItem == null)
+            {
+                return NotFound();
+            }
+            var modelItemDTO = existingModelItem.AsDTO();
+
+            patchDocument.ApplyTo(modelItemDTO, (Microsoft.AspNetCore.JsonPatch.Adapters.IObjectAdapter)ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            existingModelItem = modelItemDTO.AsModelDB(modelid);
+
+            await context.SaveChangesAsync();
+
             return Ok("Update successfully");
         }
 

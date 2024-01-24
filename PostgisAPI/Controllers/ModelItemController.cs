@@ -61,7 +61,7 @@ namespace PostgisAPI.Controllers
         /// <returns>A list of model items within the specified row index range.</returns>
         /// <response code="200">The list of model items within the specified row index range.</response>
         /// <response code="404">No model items are found for the specified model or the row index range is invalid.</response>
-        [HttpPost("{modelid}/getByRange")]
+        [HttpGet("{modelid}/inRange")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetByRowIndexRange(Guid modelid, int startIndex = 0, int endIndex = -1)
@@ -110,7 +110,7 @@ namespace PostgisAPI.Controllers
         /// <param name="modelid">The ID of the model.</param>
         /// <param name="hitPoint">The hit point to check for containment.</param>
         /// <returns>Returns a list of <see cref="ModelItemGetDTO"/> representing the model items containing the hit point.</returns>
-        [HttpPost("{modelid}/getByHitPoint")]
+        [HttpGet("{modelid}/hitPoint")]
         public ActionResult<IEnumerable<ModelItemGetDTO>> GetByHitPoint(Guid modelid, Point hitPoint)
         {
             IEnumerable<ModelItemGetDTO> modelItems = context.ModelItems
@@ -134,7 +134,7 @@ namespace PostgisAPI.Controllers
         /// <returns>A list of model items associated with the specified batching model item.</returns>
         /// <response code="200">The model items for the specified batching model item.</response>
         /// <response code="404">No model items are found for the specified batching model item.</response>
-        [HttpPost("getByBatchedModelItem")]
+        [HttpGet("batchedModelItem")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public ActionResult<IEnumerable<ModelItemGetDTO>> GetByBatchedModelItem( Guid batchedmodelitemid)
@@ -161,7 +161,7 @@ namespace PostgisAPI.Controllers
         /// <returns>The requested model item.</returns>
         /// <response code="200">The requested model item.</response>
         /// <response code="404">No model item is found for the specified model and hierarchy index.</response>
-        [HttpPost("{modelid}/getByHierachyIndex")]
+        [HttpGet("{modelid}/hierachyIndex")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public ActionResult<ModelItemGetDTO> GetByHierachyIndex(Guid modelid, int hierachyindex)

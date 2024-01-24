@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using PostgisAPI.DTO;
 using PostgisAPI.Models;
 using PostgisAPI.Models.Supporters;
@@ -122,7 +121,6 @@ namespace PostgisAPI.Controllers
                 return modelItems.ToList();
             }
             return NotFound();
-
         }
 
         /// <summary>
@@ -161,24 +159,14 @@ namespace PostgisAPI.Controllers
                 return NotFound();
             }
 
-            modelItem.HierarchyIndex = modelItemDTO.HierarchyIndex;
-            modelItem.ParentHierachyIndex = modelItemDTO.ParentHierachyIndex;
-            modelItem.DisplayName = modelItemDTO.DisplayName;
-            modelItem.Path = modelItemDTO.Path;
-            modelItem.Color = JsonConvert.SerializeObject(modelItemDTO.Color);
-            modelItem.Mesh = JsonConvert.SerializeObject(modelItemDTO.Mesh);
-            modelItem.Matrix = modelItemDTO.Matrix;
-            modelItem.AABB = JsonConvert.SerializeObject(modelItemDTO.AABB);
-            modelItem.BatchedModelItemID = modelItemDTO.BatchedModelItemID;
-            modelItem.Properties = modelItemDTO.Properties;
-            modelItem.LastModifiedTime = DateTime.Now;
+            modelItem = modelItemDTO.AsModelDB(modelid);
 
             await context.SaveChangesAsync();
-            return Ok("Update successfully");
+            return Ok(new { result = "Update successfully", updatedModelItem = modelItemDTO });
         }
 
         /// <summary>
-        /// Update one or many attribute of a model item
+        /// Update one or many attributes of a model item
         /// </summary>
         /// <param name="modelid">ID of the model</param>
         /// <param name="hierachyindex">Hierachy index of the model item</param>
@@ -187,15 +175,16 @@ namespace PostgisAPI.Controllers
         [HttpPatch("{modelid}/{hierachyindex}")]
         public async Task<IActionResult> Patch(Guid modelid, int hierachyindex, [FromBody] JsonPatchDocument<ModelItemCreateDTO> patchDocument)
         {
-            ModelItem? existingModelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == item.ModelID && item.HierarchyIndex == hierachyindex);
+            ModelItem? existingModelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (existingModelItem == null)
             {
                 return NotFound();
             }
-            ModelItemGetDTO modelItemDTO = existingModelItem.AsDTO();
+            ModelItemCreateDTO modelItemDTO = existingModelItem.AsDTO();
 
-            patchDocument.ApplyTo(modelItemDTO, (Microsoft.AspNetCore.JsonPatch.Adapters.IObjectAdapter)ModelState);
+            patchDocument.ApplyTo(modelItemDTO, ModelState);
+
 
             if (!ModelState.IsValid)
             {
@@ -206,7 +195,7 @@ namespace PostgisAPI.Controllers
 
             await context.SaveChangesAsync();
 
-            return Ok("Update successfully");
+            return Ok(new { result = "Update successfully", updatedModelItem = modelItemDTO });
         }
 
         /// <summary>

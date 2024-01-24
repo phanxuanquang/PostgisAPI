@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PostgisUltilities.Bounding_Boxes;
+using System;
 
 namespace PostgisUltilities
 {
@@ -33,7 +34,7 @@ namespace PostgisUltilities
         /// <param name="aABB">The axis-aligned bounding box of the model item in JSON format.</param>
         /// <param name="batchedModelItemID">The ID of the batched model item, it is nullable.</param>
         /// <param name="properties">Additional properties associated with the model item.</param>
-        public ModelItemDB(int hierarchyIndex, Guid modelID, int parentHierachyIndex, string displayName, string path, Color color, Mesh mesh, double[] matrix, AABB aABB, Guid? batchedModelItemID, string properties)
+        public ModelItemDB(int hierarchyIndex, Guid modelID, int parentHierachyIndex, string displayName, string path, Color color, Mesh mesh, double[] matrix, AxisAlignedBoundingBox aABB, Guid? batchedModelItemID, string properties)
         {
             HierarchyIndex = hierarchyIndex;
             ModelID = modelID;

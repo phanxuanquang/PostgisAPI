@@ -2,10 +2,9 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using PostgisAPI.DTO;
-using PostgisAPI.DTO.Model;
 using PostgisAPI.Models;
-using PostgisAPI.Models.Supporters;
 
 namespace PostgisAPI.Controllers
 {
@@ -66,7 +65,7 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetByRowIndexRange(Guid modelid, int startIndex = 0, int endIndex = -1)
         {
-            var modelItems = await context.ModelItems
+            List<ModelItem> modelItems = await context.ModelItems
                 .Where(item => item.ModelID == modelid)
                 .ToListAsync();
 
@@ -75,7 +74,7 @@ namespace PostgisAPI.Controllers
                 endIndex = modelItems.Count() - 1;
             }
 
-            var res = modelItems.Where(item => startIndex <= item.ID && item.ID <= endIndex).Select(item => item.AsDTO());
+            IEnumerable<ModelItemGetDTO> res = modelItems.Where(item => startIndex <= item.ID && item.ID <= endIndex).Select(item => item.AsDTO());
 
             return Ok(res);
         }
@@ -105,23 +104,23 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Gets a list of model items of a specific model that contain a given hit point.
+        /// Gets a list of model items of a specific model that contain a given straight ine.
         /// </summary>
         /// <param name="modelid">The ID of the model.</param>
-        /// <param name="hitPoint">The hit point to check for containment.</param>
-        /// <returns>Returns a list of <see cref="ModelItemGetDTO"/> representing the model items containing the hit point.</returns>
-        [HttpGet("{modelid}/hitPoint")]
-        public ActionResult<IEnumerable<ModelItemGetDTO>> GetByHitPoint(Guid modelid, Point hitPoint)
+        /// <param name="hitLine">The straight line to check for containment.</param>
+        /// <returns>Returns a list of <see cref="ModelItemGetDTO"/> representing the model items intersect the given straight line.</returns>
+        [HttpPost("{modelid}/hitLine")]
+        public ActionResult<ModelItemGetDTO> GetByLine(Guid modelid, LineString hitLine)
         {
-            IEnumerable<ModelItemGetDTO> modelItems = context.ModelItems
-                .Where(item => item.ModelID == modelid && item.TouchedBy(hitPoint))
-                .Select(item => item.AsDTO());
+            ModelItemGetDTO? modelItems = context.ModelItems
+                .Where(item => item.ModelID == modelid)
+                .Select(item => item.AsDTO()).First();
 
-            if (modelItems.Any())
+            if (modelItems == null)
             {
-                return modelItems.ToList();
+                return NotFound();
             }
-            return NotFound();
+            return modelItems;
         }
 
         /// <summary>
@@ -137,7 +136,7 @@ namespace PostgisAPI.Controllers
         [HttpGet("batchedModelItem")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public ActionResult<IEnumerable<ModelItemGetDTO>> GetByBatchedModelItem( Guid batchedmodelitemid)
+        public ActionResult<IEnumerable<ModelItemGetDTO>> GetByBatchedModelItem(Guid batchedmodelitemid)
         {
             IEnumerable<ModelItemGetDTO> modelItems = context.ModelItems
                 .Where(item => item.BatchedModelItemID == batchedmodelitemid)

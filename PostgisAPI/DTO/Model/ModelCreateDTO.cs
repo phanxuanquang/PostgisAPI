@@ -1,4 +1,5 @@
-﻿using PostgisAPI.Models.Supporters;
+﻿using PostgisUltilities;
+using PostgisUltilities.Bounding_Boxes;
 
 namespace PostgisAPI.DTO.Model
 {

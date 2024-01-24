@@ -1,13 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using NetTopologySuite.Geometries;
+using Newtonsoft.Json;
 
 namespace PostgisUltilities
 {
-    public class Point
+    public class PointZ
     {
         public double x { get; set; }
         public double y { get; set; }
         public double z { get; set; }
-        public Point(double x = 0, double y = 0, double z = 0)
+        public PointZ(double x = 0, double y = 0, double z = 0)
         {
             this.x = x;
             this.y = y;
@@ -18,9 +19,9 @@ namespace PostgisUltilities
         {
             return JsonConvert.SerializeObject(this);
         }
-        public NetTopologySuite.Geometries.Point AsGeometry()
+        public Point AsGeometry()
         {
-            return new NetTopologySuite.Geometries.Point(x, y, z);
+            return new Point(x, y, z);
         }
     }
 }

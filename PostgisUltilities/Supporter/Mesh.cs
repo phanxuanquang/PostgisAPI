@@ -7,11 +7,11 @@ namespace PostgisUltilities
 {
     public class Mesh
     {
-        public List<Point> vertices { get; set; }
+        public List<PointZ> vertices { get; set; }
         public List<int> faceIndexes { get; set; }
         public Mesh()
         {
-            vertices = new List<Point>();
+            vertices = new List<PointZ>();
             faceIndexes = new List<int>();
         }
         public string AsJson()
@@ -21,7 +21,7 @@ namespace PostgisUltilities
 
         public Geometry AsGeometry()
         {
-            CoordinateZ AsCoordinateZ(Point point)
+            CoordinateZ AsCoordinateZ(PointZ point)
             {
                 return new CoordinateZ(point.x, point.y, point.z);
             }
@@ -40,10 +40,16 @@ namespace PostgisUltilities
             return geometryFactory.CreatePolygon(linearRing);
         }
 
-        public bool TouchedBy(Point hitPoint)
+        public bool TouchedBy(PointZ hitPoint)
         {
-            NetTopologySuite.Geometries.Point point = new NetTopologySuite.Geometries.Point(hitPoint.x, hitPoint.y, hitPoint.z);
+            
+            Point point = new Point(hitPoint.x, hitPoint.y, hitPoint.z);
             return this.AsGeometry().Touches(point);
+        }
+
+        public bool Intersects(LineString line)
+        {
+            return this.AsGeometry().Intersects(line);
         }
     }
 }

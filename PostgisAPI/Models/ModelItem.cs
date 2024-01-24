@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using PostgisAPI.DTO;
-using PostgisAPI.Models.Supporters;
+using PostgisUltilities;
+using PostgisUltilities.Bounding_Boxes;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PostgisAPI.Models
@@ -41,18 +42,6 @@ namespace PostgisAPI.Models
         public string Properties { get; set; }
         [Column("lastmodifiedtime")]
         public DateTime LastModifiedTime { get; set; } = DateTime.Now;
-
-        public bool Contains(Point point)
-        {
-            AxisAlignedBoundingBox aabb = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(AABB);
-            return aabb.Contains(point);
-        }
-
-        public bool TouchedBy(Point point)
-        {
-            Mesh mesh = JsonConvert.DeserializeObject<Mesh>(Mesh);
-            return mesh.TouchedBy(point);
-        }
 
         public ModelItemGetDTO AsDTO()
         {

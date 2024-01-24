@@ -154,15 +154,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Supporter\AABB.cs" />
     <Compile Include="Bounding Boxes\AxisAlignedBoundingBox.cs" />
+    <Compile Include="Bounding Boxes\AabbAsGeo.cs" />
     <Compile Include="Supporter\Color.cs" />
     <Compile Include="DatabaseManager.cs" />
     <Compile Include="GeometryHelper.cs" />
     <Compile Include="Bounding Boxes\OrientedBoundingBox.cs" />
     <Compile Include="Supporter\Mesh.cs" />
     <Compile Include="ModelItemDB.cs" />
-    <Compile Include="Supporter\Point.cs" />
+    <Compile Include="Supporter\PointZ.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

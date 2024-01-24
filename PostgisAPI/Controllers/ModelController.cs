@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using PostgisAPI.DTO.Model;
 using PostgisAPI.Models;
-using PostgisUltilities;
 using PostgisUltilities.Bounding_Boxes;
 
 namespace PostgisAPI.Controllers

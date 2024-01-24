@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using Npgsql;
+﻿using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;

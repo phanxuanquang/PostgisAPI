@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Geometries;
 using PostgisAPI.DTO;
 using PostgisAPI.Models;
 using PostgisUltilities;

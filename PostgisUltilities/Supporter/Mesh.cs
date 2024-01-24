@@ -1,5 +1,4 @@
-﻿using g3;
-using NetTopologySuite.Geometries;
+﻿using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -27,7 +26,7 @@ namespace PostgisUltilities
             }
 
             List<CoordinateZ> fullVertices = new List<CoordinateZ>();
-            for(int i = 0; i < faceIndexes.Count; i++)
+            for (int i = 0; i < faceIndexes.Count; i++)
             {
                 fullVertices.Add(AsCoordinateZ(vertices[faceIndexes[i]]));
             }
@@ -42,14 +41,14 @@ namespace PostgisUltilities
 
         public bool TouchedBy(PointZ hitPoint)
         {
-            
+
             Point point = new Point(hitPoint.x, hitPoint.y, hitPoint.z);
-            return this.AsGeometry().Touches(point);
+            return AsGeometry().Touches(point);
         }
 
         public bool Intersects(LineString line)
         {
-            return this.AsGeometry().Intersects(line);
+            return AsGeometry().Intersects(line);
         }
     }
 }

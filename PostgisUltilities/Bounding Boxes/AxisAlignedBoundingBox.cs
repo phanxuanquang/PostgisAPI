@@ -1,17 +1,11 @@
-﻿using g3;
-using NetTopologySuite.Geometries;
+﻿using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PostgisUltilities.Bounding_Boxes
 {
     public class AxisAlignedBoundingBox
     {
-        public PointZ MinPoint {  get; set; }
+        public PointZ MinPoint { get; set; }
         public PointZ MaxPoint { get; set; }
         public AxisAlignedBoundingBox()
         {

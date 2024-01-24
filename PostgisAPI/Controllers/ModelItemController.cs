@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using PostgisAPI.DTO;
 using PostgisAPI.Models;
+using PostgisUltilities;
 
 namespace PostgisAPI.Controllers
 {
@@ -104,16 +105,23 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Gets a list of model items of a specific model that contain a given straight ine.
+        /// Get the model item hit by the given point
         /// </summary>
-        /// <param name="modelid">The ID of the model.</param>
-        /// <param name="hitLine">The straight line to check for containment.</param>
-        /// <returns>Returns a list of <see cref="ModelItemGetDTO"/> representing the model items intersect the given straight line.</returns>
-        [HttpPost("{modelid}/hitLine")]
-        public ActionResult<ModelItemGetDTO> GetByLine(Guid modelid, LineString hitLine)
+        /// <remarks>
+        /// Get a specific model item based on the specified hit point within the specified model.
+        /// </remarks>
+        /// <param name="modelid">The GUID of the model for which to get the model item.</param>
+        /// <param name="hitPoint">The hit point used to find the intersecting model item.</param>
+        /// <returns>The model item hit by the given point.</returns>
+        /// <response code="200">RThe model item hit by the given point.</response>
+        /// <response code="404">No model item is found for the specified model and hit point.</response>
+        [HttpPost("{modelid}/hitPoint")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public ActionResult<ModelItemGetDTO> GetByLine(Guid modelid, PointZ hitPoint)
         {
             ModelItemGetDTO? modelItems = context.ModelItems
-                .Where(item => item.ModelID == modelid)
+                .Where(item => item.ModelID == modelid && item.AsDTO().Mesh.TouchedBy(hitPoint))
                 .Select(item => item.AsDTO()).First();
 
             if (modelItems == null)

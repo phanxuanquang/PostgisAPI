@@ -1,4 +1,5 @@
-﻿using Npgsql;
+﻿using Newtonsoft.Json.Linq;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -71,16 +72,29 @@ namespace PostgisUltilities
         /// <param name="modelItems"></param>
         public void Insert(List<ModelItemDB> modelItems)
         {
-            string sqlCommand = string.Empty;
+            string commands = string.Empty;
             string prefix = "INSERT INTO ModelItem (ModelID, ModelItemID, DisplayName, HierachyIndex, ParentHierachyIndex, Path, Color, Mesh, Matrix, AABB, Properties, LastModifiedTime, BatchedModelItemID) VALUES ";
 
             foreach (ModelItemDB modelItem in modelItems)
             {
-                string values = $"VALUES ({modelItem.ModelID}, {modelItem.ModelItemID}, {modelItem.DisplayName}, {modelItem.ParentHierachyIndex}, {modelItem.Path}, {modelItem.Color}, {modelItem.AABB}, {modelItem.Properties}, {modelItem.LastModifiedTime}, {modelItem.LastModifiedTime}, {modelItem.BatchedModelItemID}); \n";
+                string values = $"('ed974e1e-7ba0-4fb0-9a35-07fb6f4c7ead', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{String.Format("{{0}}", modelItem.Matrix)}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null); \n";
                 string command = prefix + values;
-                sqlCommand += command;
+                commands += command;
             }
-            Execute(sqlCommand, $"Inserting data failed");
+            Execute(commands, $"Inserting data failed");
+        }
+
+        public void BatchModelItems(List<ModelItemDB> modelItems, List<Guid> batchModelItemIDs)
+        {
+            string commands = string.Empty;
+            string prefix = "UPDATE ModelItem SET BatchedModelItemID = ";
+            for (int i = 0; i < modelItems.Count; i++)
+            {
+                string value = $"'{batchModelItemIDs[i]}' WHERE ModelItemID = '{modelItems[i].ModelItemID}';\n";
+                string command = prefix + value;
+                commands += command;
+            }
+            Execute(commands, $"Batch model items failed");
         }
     }
 }

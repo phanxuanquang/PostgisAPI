@@ -114,7 +114,7 @@ namespace PostgisAPI.Controllers
         public ActionResult<IEnumerable<ModelItemGetDTO>> GetByHitPoint(Guid modelid, Point hitPoint)
         {
             IEnumerable<ModelItemGetDTO> modelItems = context.ModelItems
-                .Where(item => item.ModelID == modelid && item.Contains(hitPoint))
+                .Where(item => item.ModelID == modelid && item.TouchedBy(hitPoint))
                 .Select(item => item.AsDTO());
 
             if (modelItems.Any())

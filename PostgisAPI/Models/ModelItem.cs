@@ -48,6 +48,12 @@ namespace PostgisAPI.Models
             return aabb.Contains(point);
         }
 
+        public bool TouchedBy(Point point)
+        {
+            Mesh mesh = JsonConvert.DeserializeObject<Mesh>(Mesh);
+            return mesh.TouchedBy(point);
+        }
+
         public ModelItemGetDTO AsDTO()
         {
             return new ModelItemGetDTO

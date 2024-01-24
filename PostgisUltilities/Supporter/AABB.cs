@@ -18,6 +18,7 @@ namespace PostgisUltilities
         {
             return JsonConvert.SerializeObject(this);
         }
+
         public bool Contains(Point point)
         {
             NetTopologySuite.Geometries.Point minPoint = MinPoint.AsGeometry();

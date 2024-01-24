@@ -77,9 +77,7 @@ namespace PostgisUltilities
 
             foreach (ModelItemDB modelItem in modelItems)
             {
-                string leftSign = "{";
-                string rightSign = "}";
-                string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{leftSign}{String.Join(", ", modelItem.Matrix)}{rightSign}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null); \n";
+                string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{"{"}{String.Join(", ", modelItem.Matrix)}{"}"}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null); \n";
                 string command = prefix + values;
                 commands += command;
             }

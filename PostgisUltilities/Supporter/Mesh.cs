@@ -46,9 +46,10 @@ namespace PostgisUltilities
             return AsGeometry().Touches(point);
         }
 
-        public bool Intersects(LineString line)
+        public bool Intersects(PointZ hitPoint)
         {
-            return AsGeometry().Intersects(line);
+            Point point = new Point(hitPoint.x, hitPoint.y, hitPoint.z);
+            return AsGeometry().Intersects(point);
         }
     }
 }

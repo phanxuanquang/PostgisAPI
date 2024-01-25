@@ -6,5 +6,15 @@ namespace PostgisAPI.DTO.Model
     {
         public string DisplayName { get; set; }
         public AxisAlignedBoundingBox? AABB { get; set; }
+        public Models.Model AsModelDB()
+        {
+            return new Models.Model()
+            {
+                ModelID = Guid.NewGuid(),
+                DisplayName = this.DisplayName,
+                AABB = this.AABB.AsJson(),
+                LastModifiedTime = DateTime.Now
+            };
+        }
     }
 }

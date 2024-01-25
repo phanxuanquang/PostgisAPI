@@ -29,11 +29,13 @@ namespace PostgisAPI.DTO
                 BatchedModelItemID = BatchedModelItemID,
                 DisplayName = DisplayName,
                 Path = Path,
-                Color = JsonConvert.SerializeObject(Color),
+                Color = Color.AsJson(),
                 Matrix = Matrix,
-                AABB = JsonConvert.SerializeObject(AABB),
-                Mesh = JsonConvert.SerializeObject(Mesh),
-                Properties = Properties
+                AABB = AABB.AsJson(),
+                Mesh = Mesh.AsJson(),
+                Properties = Properties,
+                LastModifiedTime = DateTime.Now
+
             };
         }
     }

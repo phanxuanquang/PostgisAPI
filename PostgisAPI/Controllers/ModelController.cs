@@ -26,15 +26,10 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<ModelGetDTO>))]
         public ActionResult<IEnumerable<ModelGetDTO>> GetAll()
         {
-            IEnumerable<ModelGetDTO> models = context.Models.Select(item => new ModelGetDTO
-            {
-                ModelID = item.ModelID,
-                DisplayName = item.DisplayName,
-                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(item.AABB),
-                LastModifiedTime = item.LastModifiedTime
-            });
+            IEnumerable<ModelGetDTO> models = context.Models.Select(item => item.AsDTO());
 
-            return models.ToList();
+            var res = models.ToList();
+            return Ok(new { total = res.Count, models = res });
         }
 
         /// <summary>
@@ -53,18 +48,10 @@ namespace PostgisAPI.Controllers
 
             if (model == null)
             {
-                return NotFound();
+                return NotFound("Not found");
             }
 
-            ModelGetDTO item = new ModelGetDTO
-            {
-                ModelID = model.ModelID,
-                DisplayName = model.DisplayName,
-                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(model.AABB),
-                LastModifiedTime = model.LastModifiedTime
-            };
-
-            return item;
+            return model.AsDTO();
         }
 
         /// <summary>
@@ -80,16 +67,12 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(201, Type = typeof(Model))]
         public ActionResult<string> Create(ModelCreateDTO modelItemDTO)
         {
-            Model model = new Model
-            {
-                ModelID = Guid.NewGuid(),
-                DisplayName = modelItemDTO.DisplayName,
-                AABB = JsonConvert.SerializeObject(modelItemDTO.AABB),
-            };
+            Model model = modelItemDTO.AsModelDB();
 
             context.Models.Add(model);
             context.SaveChanges();
-            return model.ModelID.ToString();
+
+            return Created("Create successfully", model.ModelID.ToString());
         }
     }
 }

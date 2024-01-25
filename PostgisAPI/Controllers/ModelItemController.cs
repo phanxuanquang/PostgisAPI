@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Index.HPRtree;
 using PostgisAPI.DTO;
 using PostgisAPI.Models;
 using PostgisUltilities;
@@ -42,7 +43,7 @@ namespace PostgisAPI.Controllers
 
             if (modelItem == null)
             {
-                return NotFound();
+                return NotFound("Not found");
             }
 
             return modelItem.AsDTO();
@@ -73,10 +74,19 @@ namespace PostgisAPI.Controllers
             {
                 endIndex = modelItems.Count() - 1;
             }
+            if (startIndex > endIndex)
+            {
+                return BadRequest("Invalid input");
+            }
 
             IEnumerable<ModelItemGetDTO> res = modelItems.Where(item => startIndex <= item.ID && item.ID <= endIndex).Select(item => item.AsDTO());
 
-            return Ok(res);
+            var total = res.Count();
+            if(total == 0)
+            {
+                return NotFound("Not found");
+            }
+            return Ok(new { total = total, modelItems = res });
         }
 
         /// <summary>
@@ -88,7 +98,7 @@ namespace PostgisAPI.Controllers
         /// <param name="modelid">The GUID of the model to which the new model item will be associated.</param>
         /// <param name="modelItemDTO">The data for creating the new model item with nullable 'batchedModelItemID' field.</param>
         /// <returns>The created model item.</returns>
-        /// <response code="201">The created model item with its information.</response>
+        /// <response code="201">The created model item.</response>
         /// <response code="400">The request data is invalid or incomplete.</response>
         [HttpPost("{modelid}")]
         [ProducesResponseType(201)]
@@ -100,7 +110,7 @@ namespace PostgisAPI.Controllers
             context.ModelItems.Add(modelItem);
             context.SaveChanges();
 
-            return modelItem;
+            return Created("Create successfully", modelItem.ModelItemID.ToString());
         }
 
         /// <summary>
@@ -112,22 +122,21 @@ namespace PostgisAPI.Controllers
         /// <param name="modelid">The GUID of the model for which to get the model item.</param>
         /// <param name="hitPoint">The hit point used to find the intersecting model item.</param>
         /// <returns>The model item hit by the given point.</returns>
-        /// <response code="200">RThe model item hit by the given point.</response>
+        /// <response code="200">The model item hit by the given point.</response>
         /// <response code="404">No model item is found for the specified model and hit point.</response>
         [HttpPost("{modelid}/hitPoint")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public ActionResult<ModelItemGetDTO> GetByLine(Guid modelid, PointZ hitPoint)
+        public ActionResult<ModelItemGetDTO> GetByHitPoint(Guid modelid, PointZ hitPoint)
         {
-            ModelItemGetDTO? modelItems = context.ModelItems
-                .Where(item => item.ModelID == modelid && item.AsDTO().Mesh.TouchedBy(hitPoint))
-                .Select(item => item.AsDTO()).First();
-
-            if (modelItems == null)
+            foreach(var modelItem in context.ModelItems)
             {
-                return NotFound();
+                if(modelItem.ModelID == modelid && modelItem.AsDTO().Mesh.TouchedBy(hitPoint))
+                {
+                    return modelItem.AsDTO();
+                }
             }
-            return modelItems;
+            return NotFound("Not found");
         }
 
         /// <summary>
@@ -153,7 +162,7 @@ namespace PostgisAPI.Controllers
             {
                 return modelItems.ToList();
             }
-            return NotFound();
+            return NotFound("Not found");
         }
 
         /// <summary>
@@ -170,14 +179,14 @@ namespace PostgisAPI.Controllers
         [HttpGet("{modelid}/hierachyIndex")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public ActionResult<ModelItemGetDTO> GetByHierachyIndex(Guid modelid, int hierachyindex)
+        public ActionResult<ModelItemGetDTO> GetByHierachyIndex(Guid modelid, int hierachyindex = 0)
         {
             ModelItem? modelItem = context.ModelItems
                 .FirstOrDefault(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)
             {
-                return NotFound();
+                return NotFound("Not found");
             }
             return modelItem.AsDTO();
         }
@@ -196,7 +205,7 @@ namespace PostgisAPI.Controllers
 
             if (modelItem == null)
             {
-                return NotFound();
+                return NotFound("Not found");
             }
 
             modelItem = modelItemDTO.AsModelDB(modelid);
@@ -206,36 +215,38 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Update one or many attributes of a model item
+        /// Partially update a model item
         /// </summary>
-        /// <param name="modelid">ID of the model</param>
-        /// <param name="hierachyindex">Hierachy index of the model item</param>
-        /// <param name="patchDocument"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// Update one or many attributes of a model item. In case you want to update all attributes of a model item, use PUT method instead.
+        /// </remarks>
+        /// <param name="modelid">The GUID of the model for which to get the model item.</param>
+        /// <param name="hierachyindex">The hierarchy index of the model item within the specified model.</param>
+        /// <param name="patchData">The attributes to be update with new values. The 'operationType' and 'from' fields can be null.</param>
+        /// <returns>Updating status</returns>
+        /// <response code="200">Success</response>
+        /// <response code="404">No model item is found for the specified model and hierarchy index.</response>
         [HttpPatch("{modelid}/{hierachyindex}")]
-        public async Task<IActionResult> Patch(Guid modelid, int hierachyindex, [FromBody] JsonPatchDocument<ModelItemCreateDTO> patchDocument)
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Patch(Guid modelid, int hierachyindex, [FromBody] JsonPatchDocument<ModelItem> patchData)
         {
-            ModelItem? existingModelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+            ModelItem? modelItem = await context.ModelItems.Where(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex).FirstAsync();
 
-            if (existingModelItem == null)
+            if (modelItem == null)
             {
-                return NotFound();
+                return NotFound("Not found");
             }
-            ModelItemCreateDTO modelItemDTO = existingModelItem.AsDTO();
 
-            patchDocument.ApplyTo(modelItemDTO, ModelState);
-
-
+            patchData.ApplyTo(modelItem, ModelState);
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            existingModelItem = modelItemDTO.AsModelDB(modelid);
-
             await context.SaveChangesAsync();
 
-            return Ok(new { result = "Update successfully", updatedModelItem = modelItemDTO });
+            return Ok(new { result = "Update successfully", updatedModelItem = modelItem });
         }
 
         /// <summary>
@@ -252,13 +263,14 @@ namespace PostgisAPI.Controllers
 
             if (modelItem == null)
             {
-                return NotFound();
+                return NotFound("Not found");
             }
+            var deletedModelItemID = modelItem.ModelItemID.ToString();
 
             context.ModelItems.Remove(modelItem);
             await context.SaveChangesAsync();
 
-            return Ok("Delete successfully");
+            return Ok(deletedModelItemID);
         }
     }
 }

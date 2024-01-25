@@ -23,10 +23,10 @@ namespace PostgisAPI.Models
         {
             return new ModelGetDTO
             {
-                ModelID = this.ModelID,
-                DisplayName = this.DisplayName,
+                ModelID = ModelID,
+                DisplayName = DisplayName,
                 AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(AABB),
-                LastModifiedTime = this.LastModifiedTime
+                LastModifiedTime = LastModifiedTime
             };
         }
     }

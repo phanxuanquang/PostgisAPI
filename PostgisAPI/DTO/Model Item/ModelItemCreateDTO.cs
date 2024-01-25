@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using PostgisAPI.Models;
+﻿using PostgisAPI.Models;
 using PostgisUltilities;
 using PostgisUltilities.Bounding_Boxes;
 

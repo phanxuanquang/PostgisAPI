@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using PostgisAPI.DTO.Model;
 using PostgisAPI.Models;
-using PostgisUltilities.Bounding_Boxes;
 
 namespace PostgisAPI.Controllers
 {
@@ -22,13 +20,13 @@ namespace PostgisAPI.Controllers
         /// </summary>
         /// <returns>Returns a list of <see cref="ModelGetDTO"/> representing the model.</returns>
         /// <response code="200">Information of all models in the database</response>
-        [HttpGet("getAll")]
+        [HttpGet("all")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ModelGetDTO>))]
         public ActionResult<IEnumerable<ModelGetDTO>> GetAll()
         {
             IEnumerable<ModelGetDTO> models = context.Models.Select(item => item.AsDTO());
 
-            var res = models.ToList();
+            List<ModelGetDTO> res = models.ToList();
             return Ok(new { total = res.Count, models = res });
         }
 
@@ -39,7 +37,7 @@ namespace PostgisAPI.Controllers
         /// <returns>Returns a <see cref="ModelGetDTO"/> representing the model.</returns>
         /// <response code="200">The requested model.</response>
         /// <response code="404">The model with provided GUID does not exist in the database.</response>
-        [HttpGet("{modelid}")]
+        [HttpGet("guid")]
         [ProducesResponseType(200, Type = typeof(ModelGetDTO))]
         [ProducesResponseType(404)]
         public ActionResult<ModelGetDTO> GetByGuid(Guid modelid)

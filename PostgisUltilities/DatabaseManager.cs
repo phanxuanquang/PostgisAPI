@@ -82,18 +82,5 @@ namespace PostgisUltilities
             }
             Execute(commands, $"Inserting data failed");
         }
-
-        public void BatchModelItems(List<ModelItemDB> modelItems, List<Guid> batchModelItemIDs)
-        {
-            string commands = string.Empty;
-            string prefix = "UPDATE ModelItem SET BatchedModelItemID = ";
-            for (int i = 0; i < modelItems.Count; i++)
-            {
-                string value = $"'{batchModelItemIDs[i]}' WHERE ModelItemID = '{modelItems[i].ModelItemID}';\n";
-                string command = prefix + value;
-                commands += command;
-            }
-            Execute(commands, $"Batch model items failed");
-        }
     }
 }

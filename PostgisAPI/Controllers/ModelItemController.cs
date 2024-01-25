@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Index.HPRtree;
 using PostgisAPI.DTO;
 using PostgisAPI.Models;
 using PostgisUltilities;
@@ -24,7 +23,7 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Find a model item by its GUID
+        /// Get detail of a model item
         /// </summary>
         /// <remarks>
         /// Get a specific model item based on its GUID.
@@ -33,7 +32,7 @@ namespace PostgisAPI.Controllers
         /// <returns>The requested model item.</returns>
         /// <response code="200">The requested model item.</response>
         /// <response code="404">No model item is found for the requested GUID.</response>
-        [HttpGet("{modelitemid}")]
+        [HttpGet("guid")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public ActionResult<ModelItemGetDTO> GetByGuid(Guid modelitemid)
@@ -50,7 +49,7 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Gets model items by the row index range
+        /// Get model items within a row index range
         /// </summary>
         /// <remarks>
         /// Get model items associated with the specified model within the specified row index range (get all model items by default).
@@ -61,7 +60,7 @@ namespace PostgisAPI.Controllers
         /// <returns>A list of model items within the specified row index range.</returns>
         /// <response code="200">The list of model items within the specified row index range.</response>
         /// <response code="404">No model items are found for the specified model or the row index range is invalid.</response>
-        [HttpGet("{modelid}/inRange")]
+        [HttpGet("indexRange")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetByRowIndexRange(Guid modelid, int startIndex = 0, int endIndex = -1)
@@ -81,8 +80,8 @@ namespace PostgisAPI.Controllers
 
             IEnumerable<ModelItemGetDTO> res = modelItems.Where(item => startIndex <= item.ID && item.ID <= endIndex).Select(item => item.AsDTO());
 
-            var total = res.Count();
-            if(total == 0)
+            int total = res.Count();
+            if (total == 0)
             {
                 return NotFound("Not found");
             }
@@ -90,7 +89,7 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Creates a new model item
+        /// Create a new model item
         /// </summary>
         /// <remarks>
         /// Creates a new model item using the provided data and associates it with the specified model.
@@ -100,7 +99,7 @@ namespace PostgisAPI.Controllers
         /// <returns>The created model item.</returns>
         /// <response code="201">The created model item.</response>
         /// <response code="400">The request data is invalid or incomplete.</response>
-        [HttpPost("{modelid}")]
+        [HttpPost("create")]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
         public ActionResult<ModelItem> Create(Guid modelid, ModelItemCreateDTO modelItemDTO)
@@ -114,7 +113,7 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Get the model item hit by the given point
+        /// Find the model item hit by the given point
         /// </summary>
         /// <remarks>
         /// Get a specific model item based on the specified hit point within the specified model.
@@ -124,14 +123,14 @@ namespace PostgisAPI.Controllers
         /// <returns>The model item hit by the given point.</returns>
         /// <response code="200">The model item hit by the given point.</response>
         /// <response code="404">No model item is found for the specified model and hit point.</response>
-        [HttpPost("{modelid}/hitPoint")]
+        [HttpPost("findByHitPoint")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public ActionResult<ModelItemGetDTO> GetByHitPoint(Guid modelid, PointZ hitPoint)
         {
-            foreach(var modelItem in context.ModelItems)
+            foreach (ModelItem modelItem in context.ModelItems)
             {
-                if(modelItem.ModelID == modelid && modelItem.AsDTO().Mesh.TouchedBy(hitPoint))
+                if (modelItem.ModelID == modelid && modelItem.AsDTO().Mesh.TouchedBy(hitPoint))
                 {
                     return modelItem.AsDTO();
                 }
@@ -140,11 +139,12 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Get model items batched by the specific model item
+        /// Find model items batched by another model item
         /// </summary>
         /// <remarks>
-        /// Get the model items associated with the specific model item.
+        /// Get model items batched by the specific model item
         /// </remarks>
+        /// <param name="modelid">The GUID of the model contains the model items.</param>
         /// <param name="batchedmodelitemid">The GUID of the batched model item for which to get associated model items.</param>
         /// <returns>A list of model items associated with the specified batching model item.</returns>
         /// <response code="200">The model items for the specified batching model item.</response>
@@ -152,21 +152,32 @@ namespace PostgisAPI.Controllers
         [HttpGet("batchedModelItem")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public ActionResult<IEnumerable<ModelItemGetDTO>> GetByBatchedModelItem(Guid batchedmodelitemid)
+        public ActionResult<IEnumerable<ModelItemGetDTO>> GetByBatchedModelItem(Guid modelid, Guid? batchedmodelitemid)
         {
-            IEnumerable<ModelItemGetDTO> modelItems = context.ModelItems
-                .Where(item => item.BatchedModelItemID == batchedmodelitemid)
-                .Select(item => item.AsDTO());
-
-            if (modelItems.Any())
+            IEnumerable<ModelItemGetDTO> modelItems = null;
+            if (batchedmodelitemid == null)
             {
-                return modelItems.ToList();
+                modelItems = context.ModelItems
+                .Where(item => item.BatchedModelItemID == null && item.ModelID == modelid)
+                .Select(item => item.AsDTO());
             }
-            return NotFound("Not found");
+            else
+            {
+                modelItems = context.ModelItems
+                .Where(item => item.BatchedModelItemID == batchedmodelitemid && item.ModelID == modelid)
+                .Select(item => item.AsDTO());
+            }
+
+            int total = modelItems.Count();
+            if (total == 0)
+            {
+                return NotFound("Not found");
+            }
+            return Ok(new { total = total, modelItems = modelItems.ToList() });
         }
 
         /// <summary>
-        /// Get a specific model item by its model GUID and hierarchy index
+        /// Find a model item by its hierarchy index
         /// </summary>
         /// <remarks>
         /// Get a specific model item based on its hierarchy index within the specified model.
@@ -176,7 +187,7 @@ namespace PostgisAPI.Controllers
         /// <returns>The requested model item.</returns>
         /// <response code="200">The requested model item.</response>
         /// <response code="404">No model item is found for the specified model and hierarchy index.</response>
-        [HttpGet("{modelid}/hierachyIndex")]
+        [HttpGet("hierarchyIndex")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public ActionResult<ModelItemGetDTO> GetByHierachyIndex(Guid modelid, int hierachyindex = 0)
@@ -192,12 +203,12 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Update a model item by its hierachy index
+        /// Update a model item
         /// </summary>
         /// <param name="hierachyindex">Hierachy index of the model item</param>
         /// <param name="modelItemDTO"></param>
         /// <returns></returns>
-        [HttpPut("{modelid}/{hierachyindex}")]
+        [HttpPut("hierarchyIndex")]
         public async Task<IActionResult> Update(Guid modelid, int hierachyindex, [FromBody] ModelItemCreateDTO modelItemDTO)
         {
             ModelItem? modelItem = await context.ModelItems
@@ -215,7 +226,7 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Partially update a model item
+        /// Update a model item partially
         /// </summary>
         /// <remarks>
         /// Update one or many attributes of a model item. In case you want to update all attributes of a model item, use PUT method instead.
@@ -226,7 +237,7 @@ namespace PostgisAPI.Controllers
         /// <returns>Updating status</returns>
         /// <response code="200">Success</response>
         /// <response code="404">No model item is found for the specified model and hierarchy index.</response>
-        [HttpPatch("{modelid}/{hierachyindex}")]
+        [HttpPatch("hierarchyIndex")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Patch(Guid modelid, int hierachyindex, [FromBody] JsonPatchDocument<ModelItem> patchData)
@@ -250,12 +261,12 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Delete a model item by its hierachy index
+        /// Delete a model item
         /// </summary>
         /// <param name="modelid">The ID of the model</param>
         /// <param name="hierachyindex">The hierachy index of the model item</param>
         /// <returns></returns>
-        [HttpDelete("{modelid}/{hierachyindex}")]
+        [HttpDelete("hierarchyIndex")]
         public async Task<IActionResult> Delete(Guid modelid, int hierachyindex)
         {
             ModelItem? modelItem = await context.ModelItems
@@ -265,12 +276,52 @@ namespace PostgisAPI.Controllers
             {
                 return NotFound("Not found");
             }
-            var deletedModelItemID = modelItem.ModelItemID.ToString();
+            string deletedModelItemID = modelItem.ModelItemID.ToString();
 
             context.ModelItems.Remove(modelItem);
             await context.SaveChangesAsync();
 
             return Ok(deletedModelItemID);
         }
+
+        /// <summary>
+        /// Batch model items
+        /// </summary>
+        /// <param name="modelId">The GUID of the model contains the model items to be batched.</param>
+        /// <param name="modelItemBatchedModelItemPairs">The key-value pairs containing GUID of model items and GUID of batched model items.</param>
+        /// <returns>A response indicating the success or failure of the operation.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="400">Invalid input data or bad request format.</response>
+        /// <response code="404">No model items found.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
+        [HttpPut("batchModelItems")]
+        [ProducesResponseType(200, Type = typeof(string))]
+        [ProducesResponseType(400, Type = typeof(string))]
+        [ProducesResponseType(404, Type = typeof(string))]
+        [ProducesResponseType(500, Type = typeof(string))]
+        public async Task<IActionResult> BatchModelItems(Guid modelId, [FromBody] Dictionary<Guid, Guid?> modelItemBatchedModelItemPairs)
+        {
+            List<ModelItem> modelItemsToUpdate = await context.ModelItems
+                .Where(item => item.ModelID == modelId)
+                .ToListAsync();
+
+            if (modelItemsToUpdate == null || modelItemsToUpdate.Count == 0)
+            {
+                return NotFound("Not found");
+            }
+
+            foreach (ModelItem? modelItem in modelItemsToUpdate)
+            {
+                if (modelItemBatchedModelItemPairs.TryGetValue(modelItem.ModelItemID, out Guid? batchedModelItemId))
+                {
+                    modelItem.BatchedModelItemID = batchedModelItemId;
+                }
+            }
+
+            await context.SaveChangesAsync();
+
+            return Ok("Success");
+        }
+
     }
 }

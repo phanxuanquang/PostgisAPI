@@ -11,8 +11,8 @@ namespace PostgisAPI.DTO.Model
             return new Models.Model()
             {
                 ModelID = Guid.NewGuid(),
-                DisplayName = this.DisplayName,
-                AABB = this.AABB.AsJson(),
+                DisplayName = DisplayName,
+                AABB = AABB.AsJson(),
                 LastModifiedTime = DateTime.Now
             };
         }

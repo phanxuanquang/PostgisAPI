@@ -1,6 +1,7 @@
 ﻿using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using Newtonsoft.Json;
+using PostgisUltilities.Bounding_Boxes;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -48,6 +49,11 @@ namespace PostgisUltilities
         public OrientedBoundingBox GetObbOf(List<Geometry> geometries)
         {
             return new OrientedBoundingBox(CreateMergedGeometryFrom(geometries));
+        }
+
+        public AxisAlignedBoundingBox GetAabbOf(Geometry geometry)
+        {
+            return null;
         }
 
         /// <summary>

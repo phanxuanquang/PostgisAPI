@@ -49,36 +49,21 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Get model items within a row index range
+        /// Get all model item
         /// </summary>
         /// <remarks>
         /// Get model items associated with the specified model within the specified row index range (get all model items by default).
         /// </remarks>
         /// <param name="modelid">The GUID of the model for which to get model items.</param>
-        /// <param name="startIndex"></param>
-        /// <param name="endIndex">-1 means the total model items assosicated with the provided model.</param>
         /// <returns>A list of model items within the specified row index range.</returns>
         /// <response code="200">The list of model items within the specified row index range.</response>
         /// <response code="404">No model items are found for the specified model or the row index range is invalid.</response>
-        [HttpGet("indexRange")]
+        [HttpGet("all")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> GetByRowIndexRange(Guid modelid, int startIndex = 0, int endIndex = -1)
+        public async Task<IActionResult> GetByRowIndexRange(Guid modelid)
         {
-            List<ModelItem> modelItems = await context.ModelItems
-                .Where(item => item.ModelID == modelid)
-                .ToListAsync();
-
-            if (endIndex == -1)
-            {
-                endIndex = modelItems.Count() - 1;
-            }
-            if (startIndex > endIndex)
-            {
-                return BadRequest("Invalid input");
-            }
-
-            IEnumerable<ModelItemGetDTO> res = modelItems.Where(item => startIndex <= item.ID && item.ID <= endIndex).Select(item => item.AsDTO());
+            IEnumerable<ModelItemGetDTO> res = context.ModelItems.Where(item => item.ModelID == modelid).Select(item => item.AsDTO());
 
             int total = res.Count();
             if (total == 0)

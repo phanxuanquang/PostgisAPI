@@ -1,6 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.JsonPatch;
+﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PostgisAPI.DTO;
@@ -24,12 +22,12 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Get detail of a model item
+        /// Find the model item by its GUID
         /// </summary>
         /// <remarks>
         /// Get a specific model item based on its GUID.
         /// </remarks>
-        /// <param name="modelitemid">The GUID of the model item to get.</param>
+        /// <param name="modelitemid">The GUID of the model item to be found.</param>
         /// <returns>The requested model item.</returns>
         /// <response code="200">The requested model item.</response>
         /// <response code="404">No model item is found for the requested GUID.</response>
@@ -43,7 +41,7 @@ namespace PostgisAPI.Controllers
 
             if (modelItem == null)
             {
-                return NotFound("Not found");
+                return NotFound("Not Found");
             }
 
             return modelItem.AsDTO();
@@ -69,7 +67,7 @@ namespace PostgisAPI.Controllers
             int total = res.Count();
             if (total == 0)
             {
-                return NotFound("Not found");
+                return NotFound("Not Found");
             }
             return Ok(res);
         }
@@ -121,7 +119,7 @@ namespace PostgisAPI.Controllers
                     return modelItem.AsDTO();
                 }
             }
-            return NotFound("Not found");
+            return NotFound("Not Found");
         }
 
         /// <summary>
@@ -131,7 +129,7 @@ namespace PostgisAPI.Controllers
         /// Get model items batched by the specific model item
         /// </remarks>
         /// <param name="modelid">The GUID of the model contains the model items.</param>
-        /// <param name="batchedmodelitemid">The GUID of the batched model item for which to get associated model items.</param>
+        /// <param name="batchedmodelitemid">The GUID of the batching model item.</param>
         /// <returns>A list of model items associated with the specified batching model item.</returns>
         /// <response code="200">The model items for the specified batching model item.</response>
         /// <response code="404">No model items are found for the specified batching model item.</response>
@@ -157,7 +155,7 @@ namespace PostgisAPI.Controllers
             int total = modelItems.Count();
             if (total == 0)
             {
-                return NotFound("Not found");
+                return NotFound("Not Found");
             }
             return Ok(modelItems.ToList());
         }
@@ -183,7 +181,7 @@ namespace PostgisAPI.Controllers
 
             if (modelItem == null)
             {
-                return NotFound("Not found");
+                return NotFound("Not Found");
             }
             return modelItem.AsDTO();
         }
@@ -191,6 +189,9 @@ namespace PostgisAPI.Controllers
         /// <summary>
         /// Update a model item
         /// </summary>
+        /// <remarks>
+        /// Update one or many attributes of a model item. In case you want to update a model item partically, use PATCH method instead.
+        /// </remarks>
         /// <param name="hierachyindex">Hierachy index of the model item</param>
         /// <param name="modelItemDTO"></param>
         /// <returns></returns>
@@ -202,13 +203,13 @@ namespace PostgisAPI.Controllers
 
             if (modelItem == null)
             {
-                return NotFound("Not found");
+                return NotFound("Not Found");
             }
 
             modelItem = modelItemDTO.AsModelDB(modelid);
 
             await context.SaveChangesAsync();
-            return Ok(new { result = "Update successfully", updatedModelItem = modelItemDTO });
+            return Ok("Success");
         }
 
         /// <summary>
@@ -232,7 +233,7 @@ namespace PostgisAPI.Controllers
 
             if (modelItem == null)
             {
-                return NotFound("Not found");
+                return NotFound("Not Found");
             }
 
             patchData.ApplyTo(modelItem, ModelState);
@@ -243,24 +244,26 @@ namespace PostgisAPI.Controllers
 
             await context.SaveChangesAsync();
 
-            return Ok(new { result = "Update successfully", updatedModelItem = modelItem });
+            return Ok("Success");
         }
 
         /// <summary>
         /// Delete a model item
         /// </summary>
-        /// <param name="modelid">The ID of the model</param>
-        /// <param name="hierachyindex">The hierachy index of the model item</param>
+        /// <remarks>
+        /// Hard-delete a model item
+        /// </remarks>
+        /// <param name="modelid">The GUID of the model contains the model item to be deleted.</param>
+        /// <param name="hierachyindex">The hierachy index of the model item.</param>
         /// <returns></returns>
         [HttpDelete("hierarchyIndex")]
         public async Task<IActionResult> Delete(Guid modelid, int hierachyindex)
         {
-            ModelItem? modelItem = await context.ModelItems
-                .FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+            ModelItem? modelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)
             {
-                return NotFound("Not found");
+                return NotFound("Not Found");
             }
             string deletedModelItemID = modelItem.ModelItemID.ToString();
 
@@ -274,7 +277,7 @@ namespace PostgisAPI.Controllers
         /// Batch model items
         /// </summary>
         /// <param name="modelId">The GUID of the model contains the model items to be batched.</param>
-        /// <param name="modelItemBatchedModelItemPairs">The key-value pairs containing GUID of model items and GUID of batched model items.</param>
+        /// <param name="modelItemBatchedModelItemPairs">The key-value pairs containing GUID of model items (left) and GUID of batched model items (right). The value of the batched model item is nullable. </param>
         /// <returns>A response indicating the success or failure of the operation.</returns>
         /// <response code="200">Success.</response>
         /// <response code="400">Invalid input data or bad request format.</response>
@@ -293,7 +296,7 @@ namespace PostgisAPI.Controllers
 
             if (modelItemsToUpdate == null || modelItemsToUpdate.Count == 0)
             {
-                return NotFound("Not found");
+                return NotFound("Not Found");
             }
 
             foreach (ModelItem? modelItem in modelItemsToUpdate)

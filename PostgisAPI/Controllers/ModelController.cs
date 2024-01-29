@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PostgisAPI.DTO.Model;
 using PostgisAPI.Models;
 
@@ -34,7 +33,7 @@ namespace PostgisAPI.Controllers
         /// <summary>
         /// Find a model by its GUID
         /// </summary>
-        /// <param name="modelid">The GUID of the model.</param>
+        /// <param name="modelid">The GUID of the model to be found.</param>
         /// <returns>Returns a <see cref="ModelGetDTO"/> representing the model.</returns>
         /// <response code="200">The requested model.</response>
         /// <response code="404">The model with provided GUID does not exist in the database.</response>
@@ -47,7 +46,7 @@ namespace PostgisAPI.Controllers
 
             if (model == null)
             {
-                return NotFound("Not found");
+                return NotFound("Not Found");
             }
 
             return model.AsDTO();

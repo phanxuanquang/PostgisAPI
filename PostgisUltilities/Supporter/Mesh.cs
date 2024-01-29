@@ -1,6 +1,5 @@
 ﻿using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
-using PostgisUltilities.Bounding_Boxes;
 using System.Collections.Generic;
 
 namespace PostgisUltilities
@@ -55,11 +54,7 @@ namespace PostgisUltilities
 
         public OrientedBoundingBox GetObb()
         {
-            return new OrientedBoundingBox(this.AsGeometry());
-        }
-        public AxisAlignedBoundingBox GetAabb()
-        {
-            return new AxisAlignedBoundingBox(this.AsGeometry());
+            return new OrientedBoundingBox(AsGeometry());
         }
     }
 }

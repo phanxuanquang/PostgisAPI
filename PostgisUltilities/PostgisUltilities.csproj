@@ -156,6 +156,7 @@
   <ItemGroup>
     <Compile Include="Bounding Boxes\AxisAlignedBoundingBox.cs" />
     <Compile Include="Bounding Boxes\AabbAsGeo.cs" />
+    <Compile Include="ModelDB.cs" />
     <Compile Include="Supporter\Color.cs" />
     <Compile Include="DatabaseManager.cs" />
     <Compile Include="GeometryHelper.cs" />

@@ -17,6 +17,12 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddDbContext<ApiDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin()
+                                                      .AllowAnyMethod()
+                                                      .AllowAnyHeader());
+});
 
 WebApplication app = builder.Build();
 
@@ -25,12 +31,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Postgis APIs V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "PostGIS APIs");
     });
 }
 
+app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();

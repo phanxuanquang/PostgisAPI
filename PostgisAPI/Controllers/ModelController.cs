@@ -27,7 +27,7 @@ namespace PostgisAPI.Controllers
             IEnumerable<ModelGetDTO> models = context.Models.Select(item => item.AsDTO());
 
             List<ModelGetDTO> res = models.ToList();
-            return Ok(new { total = res.Count, models = res });
+            return Ok(res);
         }
 
         /// <summary>

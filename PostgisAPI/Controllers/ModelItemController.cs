@@ -49,19 +49,19 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Get all model item
+        /// Get all model items
         /// </summary>
         /// <remarks>
-        /// Get model items associated with the specified model within the specified row index range (get all model items by default).
+        /// Getall  model items associated with the specified model
         /// </remarks>
         /// <param name="modelid">The GUID of the model for which to get model items.</param>
-        /// <returns>A list of model items within the specified row index range.</returns>
-        /// <response code="200">The list of model items within the specified row index range.</response>
-        /// <response code="404">No model items are found for the specified model or the row index range is invalid.</response>
+        /// <returns>All model items of a model.</returns>
+        /// <response code="200">All model items of a model.</response>
+        /// <response code="404">No model items are found.</response>
         [HttpGet("all")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> GetByRowIndexRange(Guid modelid)
+        public async Task<IActionResult> GetAll(Guid modelid)
         {
             IEnumerable<ModelItemGetDTO> res = context.ModelItems.Where(item => item.ModelID == modelid).Select(item => item.AsDTO());
 
@@ -70,7 +70,7 @@ namespace PostgisAPI.Controllers
             {
                 return NotFound("Not found");
             }
-            return Ok(new { total = total, modelItems = res });
+            return Ok(res);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace PostgisAPI.Controllers
             {
                 return NotFound("Not found");
             }
-            return Ok(new { total = total, modelItems = modelItems.ToList() });
+            return Ok(modelItems.ToList());
         }
 
         /// <summary>

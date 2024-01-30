@@ -1,6 +1,5 @@
-@PostgisAPI_HostAddress = http://localhost:5047
+@PostgisAPI_HostAddress = http://localhost:7186
 
-GET {{PostgisAPI_HostAddress}}/weatherforecast/
+GET {{PostgisAPI_HostAddress}}/model/all 
 Accept: application/json
-
 ###

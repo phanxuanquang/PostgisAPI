@@ -1,6 +1,8 @@
 ﻿using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace PostgisUltilities
@@ -20,9 +22,10 @@ namespace PostgisUltilities
         {
             string connectionString = $"Host={server};Port={port};Database={database};Username={username};Password={password}";
             connection = new NpgsqlConnection(connectionString);
+
         }
-
-
+        [DllImport("kernel32")]
+        private static extern bool AllocConsole();
         #region Private Executers
 
         /// <summary>
@@ -81,6 +84,71 @@ namespace PostgisUltilities
                 commands += command;
             }
             Execute(commands, $"Inserting data failed");
+        }
+
+        private string prefix = "INSERT INTO ModelItem (ModelID, ModelItemID, DisplayName, HierachyIndex, ParentHierachyIndex, Path, Color, Mesh, Matrix, AABB, Properties, LastModifiedTime, BatchedModelItemID) VALUES ";
+        public void InsertByParallel(List<ModelItemDB> modelItems)
+        {
+            int totalItem = modelItems.Count;
+            try
+            {
+                Parallel.Invoke(
+                    () => InsertByRange(modelItems, 0, totalItem / 5),
+                    () => InsertByRange(modelItems, totalItem / 5, totalItem / 5 * 2),
+                    () => InsertByRange(modelItems, totalItem / 5 * 2, totalItem / 5 * 3),
+                    () => InsertByRange(modelItems, totalItem / 5 * 3, totalItem / 5 * 4),
+                    () => InsertByRange(modelItems, totalItem / 5 * 4, totalItem)
+                );
+                MessageBox.Show("Insert successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        public async void InsertByTask(List<ModelItemDB> modelItems)
+        {
+            int totalItem = modelItems.Count;
+
+            try
+            {
+                Task t1 = InsertByRange_Task(modelItems, 0, totalItem / 5);
+                Task t2 = InsertByRange_Task(modelItems, totalItem / 5, totalItem / 5 * 2);
+                Task t3 = InsertByRange_Task(modelItems, totalItem / 5 * 2, totalItem / 5 * 3);
+                Task t4 = InsertByRange_Task(modelItems, totalItem / 5 * 3, totalItem / 5 * 4);
+                Task t5 = InsertByRange_Task(modelItems, totalItem / 5 * 4, totalItem);
+
+                await Task.WhenAll(t1, t2, t3, t4, t5);
+                MessageBox.Show("Insert successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private void InsertByRange(List<ModelItemDB> modelItems, int startIndex, int endIndex)
+        {
+            string commands = string.Empty;
+            for (int i = startIndex; i < endIndex; i++)
+            {
+                string values = $"('{modelItems[i].ModelID}', '{modelItems[i].ModelItemID}', '{modelItems[i].DisplayName.Replace("'", "")}', {modelItems[i].HierarchyIndex}, {modelItems[i].ParentHierachyIndex}, '{modelItems[i].Path}', '{modelItems[i].Color}', '{modelItems[i].Mesh}', '{"{"}{String.Join(", ", modelItems[i].Matrix)}{"}"}', '{modelItems[i].AABB}', '{modelItems[i].Properties.Replace("'", "")}', '{modelItems[i].LastModifiedTime}', null); \n";
+                string command = prefix + values;
+                commands += command;
+            }
+            Execute(commands, $"Inserting data failed");
+            commands = string.Empty;
+        }
+        private async Task InsertByRange_Task(List<ModelItemDB> modelItems, int startIndex, int endIndex)
+        {
+            string commands = string.Empty;
+            for (int i = startIndex; i < endIndex; i++)
+            {
+                string values = $"('{modelItems[i].ModelID}', '{modelItems[i].ModelItemID}', '{modelItems[i].DisplayName.Replace("'", "")}', {modelItems[i].HierarchyIndex}, {modelItems[i].ParentHierachyIndex}, '{modelItems[i].Path}', '{modelItems[i].Color}', '{modelItems[i].Mesh}', '{"{"}{String.Join(", ", modelItems[i].Matrix)}{"}"}', '{modelItems[i].AABB}', '{modelItems[i].Properties.Replace("'", "")}', '{modelItems[i].LastModifiedTime}', null); \n";
+                string command = prefix + values;
+                commands += command;
+            }
+            Execute(commands, $"Inserting data failed");
+            commands = string.Empty;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -74,32 +75,35 @@ namespace PostgisUltilities
         /// <param name="modelItems"></param>
         public void Insert(List<ModelItemDB> modelItems)
         {
-            string commands = string.Empty;
-            string prefix = "INSERT INTO ModelItem (ModelID, ModelItemID, DisplayName, HierachyIndex, ParentHierachyIndex, Path, Color, Mesh, Matrix, AABB, Properties, LastModifiedTime, BatchedModelItemID) VALUES ";
-
-            foreach (ModelItemDB modelItem in modelItems)
+            if (connection != null)
             {
-                string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{"{"}{String.Join(", ", modelItem.Matrix)}{"}"}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null); \n";
-                string command = prefix + values;
-                commands += command;
+                connection.Open();
+                using (NpgsqlTransaction transaction = connection.BeginTransaction())
+                {
+                    using (NpgsqlCommand cmd = new NpgsqlCommand())
+                    {
+                        foreach (ModelItemDB modelItem in modelItems)
+                        {
+                            string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{"{"}{String.Join(", ", modelItem.Matrix)}{"}"}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null); \n";
+                            cmd.CommandText = prefix + values;
+                            transaction.Commit();
+                        }
+                    }
+                }
+                connection.Close();
             }
-            Execute(commands, $"Inserting data failed");
+            else
+            {
+                MessageBox.Show("Connection is not intilized", "Cannot execute SQL command", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private string prefix = "INSERT INTO ModelItem (ModelID, ModelItemID, DisplayName, HierachyIndex, ParentHierachyIndex, Path, Color, Mesh, Matrix, AABB, Properties, LastModifiedTime, BatchedModelItemID) VALUES ";
         public void InsertByParallel(List<ModelItemDB> modelItems)
         {
             int totalItem = modelItems.Count;
-            string cmd1, cmd2, cmd3, cmd4, cmd5;
             try
             {
-                //Action[] functions = {
-                //    () => InsertByRange(modelItems, 0, totalItem / 5),
-                //    () => InsertByRange(modelItems, totalItem / 5, totalItem / 5 * 2),
-                //    () => InsertByRange(modelItems, totalItem / 5 * 2, totalItem / 5 * 3),
-                //    () => InsertByRange(modelItems, totalItem / 5 * 3, totalItem / 5 * 4),
-                //    () => InsertByRange(modelItems, totalItem / 5 * 4, totalItem)
-                //};
                 int threadCount = 8;
                 Action[] functions = {
                     () => InsertByRange(modelItems, 0, totalItem / threadCount),
@@ -146,27 +150,28 @@ namespace PostgisUltilities
         }
         private void InsertByRange(List<ModelItemDB> modelItems, int startIndex, int endIndex)
         {
-            string commands = string.Empty;
-            for (int i = startIndex; i < endIndex; i++)
+            if (connection != null)
             {
-                string values = $"('{modelItems[i].ModelID}', '{modelItems[i].ModelItemID}', '{modelItems[i].DisplayName.Replace("'", "")}', {modelItems[i].HierarchyIndex}, {modelItems[i].ParentHierachyIndex}, '{modelItems[i].Path}', '{modelItems[i].Color}', '{modelItems[i].Mesh}', '{"{"}{String.Join(", ", modelItems[i].Matrix)}{"}"}', '{modelItems[i].AABB}', '{modelItems[i].Properties.Replace("'", "")}', '{modelItems[i].LastModifiedTime}', null); \n";
-                string command = prefix + values;
-                commands += command;
+                connection.Open();
+                using (NpgsqlTransaction transaction = connection.BeginTransaction())
+                {
+                    using (NpgsqlCommand cmd = new NpgsqlCommand())
+                    {
+                        cmd.Connection = connection;
+                        for (int i = startIndex; i < endIndex; i++)
+                        {
+                            string values = $"('{modelItems[i].ModelID}', '{modelItems[i].ModelItemID}', '{modelItems[i].DisplayName.Replace("'", "")}', {modelItems[i].HierarchyIndex}, {modelItems[i].ParentHierachyIndex}, '{modelItems[i].Path}', '{modelItems[i].Color}', '{modelItems[i].Mesh}', '{"{"}{String.Join(", ", modelItems[i].Matrix)}{"}"}', '{modelItems[i].AABB}', '{modelItems[i].Properties.Replace("'", "")}', '{modelItems[i].LastModifiedTime}', null); \n";
+                            cmd.CommandText = prefix + values;
+                            transaction.Commit();
+                        }
+                    }
+                }
+                connection.Close();
             }
-            Execute(commands, $"Inserting data failed");
-            commands = string.Empty;
-        }
-
-        private string GetCommands(List<ModelItemDB> modelItems, int startIndex, int endIndex)
-        {
-            string commands = string.Empty;
-            for (int i = startIndex; i < endIndex; i++)
+            else
             {
-                string values = $"('{modelItems[i].ModelID}', '{modelItems[i].ModelItemID}', '{modelItems[i].DisplayName.Replace("'", "")}', {modelItems[i].HierarchyIndex}, {modelItems[i].ParentHierachyIndex}, '{modelItems[i].Path}', '{modelItems[i].Color}', '{modelItems[i].Mesh}', '{"{"}{String.Join(", ", modelItems[i].Matrix)}{"}"}', '{modelItems[i].AABB}', '{modelItems[i].Properties.Replace("'", "")}', '{modelItems[i].LastModifiedTime}', null); \n";
-                string command = prefix + values;
-                commands += command;
+                MessageBox.Show("Connection is not intilized", "Cannot execute SQL command", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            return commands;
         }
         private async Task InsertByRange_Task(List<ModelItemDB> modelItems, int startIndex, int endIndex)
         {

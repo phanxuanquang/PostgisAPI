@@ -90,14 +90,26 @@ namespace PostgisUltilities
         public void InsertByParallel(List<ModelItemDB> modelItems)
         {
             int totalItem = modelItems.Count;
+            string cmd1, cmd2, cmd3, cmd4, cmd5;
             try
             {
+                //Action[] functions = {
+                //    () => InsertByRange(modelItems, 0, totalItem / 5),
+                //    () => InsertByRange(modelItems, totalItem / 5, totalItem / 5 * 2),
+                //    () => InsertByRange(modelItems, totalItem / 5 * 2, totalItem / 5 * 3),
+                //    () => InsertByRange(modelItems, totalItem / 5 * 3, totalItem / 5 * 4),
+                //    () => InsertByRange(modelItems, totalItem / 5 * 4, totalItem)
+                //};
+                int threadCount = 8;
                 Action[] functions = {
-                    () => InsertByRange(modelItems, 0, totalItem / 5),
-                    () => InsertByRange(modelItems, totalItem / 5, totalItem / 5 * 2),
-                    () => InsertByRange(modelItems, totalItem / 5 * 2, totalItem / 5 * 3),
-                    () => InsertByRange(modelItems, totalItem / 5 * 3, totalItem / 5 * 4),
-                    () => InsertByRange(modelItems, totalItem / 5 * 4, totalItem)
+                    () => InsertByRange(modelItems, 0, totalItem / threadCount),
+                    () => InsertByRange(modelItems, totalItem / threadCount, totalItem / threadCount * 2),
+                    () => InsertByRange(modelItems, totalItem / threadCount * 2, totalItem / threadCount * 3),
+                    () => InsertByRange(modelItems, totalItem / threadCount * 3, totalItem / threadCount * 4),
+                    () => InsertByRange(modelItems, totalItem / threadCount * 4, totalItem / threadCount * 5),
+                    () => InsertByRange(modelItems, totalItem / threadCount * 5, totalItem / threadCount * 6),
+                    () => InsertByRange(modelItems, totalItem / threadCount * 6, totalItem / threadCount * 7),
+                    () => InsertByRange(modelItems, totalItem / threadCount * 7, totalItem),
                 };
 
                 Parallel.ForEach(functions, function =>
@@ -143,6 +155,18 @@ namespace PostgisUltilities
             }
             Execute(commands, $"Inserting data failed");
             commands = string.Empty;
+        }
+
+        private string GetCommands(List<ModelItemDB> modelItems, int startIndex, int endIndex)
+        {
+            string commands = string.Empty;
+            for (int i = startIndex; i < endIndex; i++)
+            {
+                string values = $"('{modelItems[i].ModelID}', '{modelItems[i].ModelItemID}', '{modelItems[i].DisplayName.Replace("'", "")}', {modelItems[i].HierarchyIndex}, {modelItems[i].ParentHierachyIndex}, '{modelItems[i].Path}', '{modelItems[i].Color}', '{modelItems[i].Mesh}', '{"{"}{String.Join(", ", modelItems[i].Matrix)}{"}"}', '{modelItems[i].AABB}', '{modelItems[i].Properties.Replace("'", "")}', '{modelItems[i].LastModifiedTime}', null); \n";
+                string command = prefix + values;
+                commands += command;
+            }
+            return commands;
         }
         private async Task InsertByRange_Task(List<ModelItemDB> modelItems, int startIndex, int endIndex)
         {

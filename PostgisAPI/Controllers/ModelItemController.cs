@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Index.HPRtree;
 using PostgisAPI.DTO;
 using PostgisAPI.Models;
 using PostgisUltilities;
+using System.Collections.Concurrent;
 
 namespace PostgisAPI.Controllers
 {
@@ -36,8 +38,7 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(404)]
         public ActionResult<ModelItemGetDTO> GetByGuid(Guid modelitemid)
         {
-            ModelItem? modelItem = context.ModelItems
-                .FirstOrDefault(item => item.ModelItemID == modelitemid);
+            ModelItem? modelItem = context.ModelItems.AsParallel().FirstOrDefault(item => item.ModelItemID == modelitemid);
 
             if (modelItem == null)
             {
@@ -62,14 +63,20 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetAll(Guid modelid)
         {
-            IEnumerable<ModelItemGetDTO> res = context.ModelItems.Where(item => item.ModelID == modelid).Select(item => item.AsDTO());
+            ConcurrentBag<ModelItemGetDTO> modelItems = new ConcurrentBag<ModelItemGetDTO>();
+            Parallel.ForEach(context.ModelItems, modelItem =>
+            {
+                if (modelItem.ModelID == modelid)
+                {
+                    modelItems.Add(modelItem.AsDTO());
+                }
+            });
 
-            int total = res.Count();
-            if (total == 0)
+            if (modelItems.Count() == 0)
             {
                 return NotFound("Not Found");
             }
-            return Ok(res);
+            return Ok(modelItems);
         }
 
         /// <summary>
@@ -138,18 +145,26 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(404)]
         public ActionResult<IEnumerable<ModelItemGetDTO>> GetByBatchedModelItem(Guid modelid, Guid? batchedmodelitemid)
         {
-            IEnumerable<ModelItemGetDTO> modelItems = null;
+            ConcurrentBag<ModelItemGetDTO> modelItems = new ConcurrentBag<ModelItemGetDTO>();
             if (batchedmodelitemid == null)
             {
-                modelItems = context.ModelItems
-                .Where(item => item.BatchedModelItemID == null && item.ModelID == modelid)
-                .Select(item => item.AsDTO());
+                Parallel.ForEach(context.ModelItems, item =>
+                {
+                    if (item.BatchedModelItemID == null && item.ModelID == modelid)
+                    {
+                        modelItems.Add(item.AsDTO());
+                    }
+                });
             }
             else
             {
-                modelItems = context.ModelItems
-                .Where(item => item.BatchedModelItemID == batchedmodelitemid && item.ModelID == modelid)
-                .Select(item => item.AsDTO());
+                Parallel.ForEach(context.ModelItems, item =>
+                {
+                    if (item.BatchedModelItemID == batchedmodelitemid && item.ModelID == modelid)
+                    {
+                        modelItems.Add(item.AsDTO());
+                    }
+                });
             }
 
             int total = modelItems.Count();
@@ -176,8 +191,7 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(404)]
         public ActionResult<ModelItemGetDTO> GetByHierachyIndex(Guid modelid, int hierachyindex = 0)
         {
-            ModelItem? modelItem = context.ModelItems
-                .FirstOrDefault(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+            ModelItem? modelItem = context.ModelItems.AsParallel().FirstOrDefault(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)
             {
@@ -198,8 +212,7 @@ namespace PostgisAPI.Controllers
         [HttpPut("hierarchyIndex")]
         public async Task<IActionResult> Update(Guid modelid, int hierachyindex, [FromBody] ModelItemCreateDTO modelItemDTO)
         {
-            ModelItem? modelItem = await context.ModelItems
-                .FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+            ModelItem? modelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)
             {
@@ -290,27 +303,51 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(500, Type = typeof(string))]
         public async Task<IActionResult> BatchModelItems(Guid modelId, [FromBody] Dictionary<Guid, Guid?> modelItemBatchedModelItemPairs)
         {
-            List<ModelItem> modelItemsToUpdate = await context.ModelItems
+            if(modelItemBatchedModelItemPairs.Count > 5000)
+            {
+                ConcurrentBag<ModelItemGetDTO> modelItemsToUpdate = new ConcurrentBag<ModelItemGetDTO>();
+                Parallel.ForEach(context.ModelItems, modelItem =>
+                {
+                    if (modelItem.ModelID == modelId)
+                    {
+                        modelItemsToUpdate.Add(modelItem.AsDTO());
+                    }
+                });
+
+                if (modelItemsToUpdate == null || modelItemsToUpdate.Count == 0)
+                {
+                    return NotFound("Not Found");
+                }
+
+                Parallel.ForEach(modelItemsToUpdate, modelItem =>
+                {
+                    if (modelItemBatchedModelItemPairs.TryGetValue(modelItem.ModelItemID, out Guid? batchedModelItemId))
+                    {
+                        modelItem.BatchedModelItemID = batchedModelItemId;
+                    }
+                });
+            }
+            else
+            {
+                List<ModelItem> modelItemsToUpdate = await context.ModelItems
                 .Where(item => item.ModelID == modelId)
                 .ToListAsync();
 
-            if (modelItemsToUpdate == null || modelItemsToUpdate.Count == 0)
-            {
-                return NotFound("Not Found");
-            }
-
-            foreach (ModelItem? modelItem in modelItemsToUpdate)
-            {
-                if (modelItemBatchedModelItemPairs.TryGetValue(modelItem.ModelItemID, out Guid? batchedModelItemId))
+                if (modelItemsToUpdate == null || modelItemsToUpdate.Count == 0)
                 {
-                    modelItem.BatchedModelItemID = batchedModelItemId;
+                    return NotFound("Not Found");
+                }
+
+                foreach (ModelItem? modelItem in modelItemsToUpdate)
+                {
+                    if (modelItemBatchedModelItemPairs.TryGetValue(modelItem.ModelItemID, out Guid? batchedModelItemId))
+                    {
+                        modelItem.BatchedModelItemID = batchedModelItemId;
+                    }
                 }
             }
-
             await context.SaveChangesAsync();
-
             return Ok("Success");
         }
-
     }
 }

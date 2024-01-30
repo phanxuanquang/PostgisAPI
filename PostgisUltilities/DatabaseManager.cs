@@ -73,8 +73,9 @@ namespace PostgisUltilities
         /// <summary>
         /// Insert a list of model item into PostGIS database
         /// </summary>
-        /// <param name="modelItems"></param>
-        public void Insert(List<ModelItemDB> modelItems, bool useParallel = false)
+        /// <param name="modelItems">The model item list to be inserted</param>
+        /// <param name="activateParallelization">Apply the parallelization (default value is True). Larger the model, higher the performance.</param>
+        public void Insert(List<ModelItemDB> modelItems, bool activateParallelization = true)
         {
             if (connection != null)
             {
@@ -84,7 +85,7 @@ namespace PostgisUltilities
                     using (NpgsqlCommand cmd = new NpgsqlCommand())
                     {
                         cmd.Connection = connection;
-                        if (useParallel)
+                        if (activateParallelization)
                         {
                             Parallel.ForEach(modelItems, modelItem =>
                             {

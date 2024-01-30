@@ -78,52 +78,9 @@ namespace PostgisUltilities
         /// </summary>
         /// <param name="modelItems">The model item list to be inserted</param>
         /// <param name="activateParallelization">Apply the parallelization (default value is True). Larger the model, higher the performance.</param>
-        private string prefix = "INSERT INTO ModelItem (ModelID, ModelItemID, DisplayName, HierachyIndex, ParentHierachyIndex, Path, Color, Mesh, Matrix, AABB, Properties, LastModifiedTime, BatchedModelItemID) VALUES ";
-
         public void Insert(List<ModelItemDB> modelItems, bool activateParallelization = true)
         {
-            object lockObject = new object();
-            if (connection != null)
-            {
-                connection.Open();
-                using (NpgsqlTransaction transaction = connection.BeginTransaction())
-                {
-                    using (NpgsqlCommand cmd = new NpgsqlCommand())
-                    {
-                        cmd.Connection = connection;
-                        if (activateParallelization)
-                        {
-                            Parallel.ForEach(modelItems, modelItem =>
-                            {
-                                lock (lockObject)
-                                {
-                                    string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{"{"}{String.Join(", ", modelItem.Matrix)}{"}"}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null); \n";
-                                    cmd.CommandText = prefix + values;
-                                    cmd.ExecuteNonQuery();
-                                }
-                            });
-                        }
-                        else
-                        {
-                            foreach (ModelItemDB modelItem in modelItems)
-                            {
-                                string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{"{"}{String.Join(", ", modelItem.Matrix)}{"}"}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null); \n";
-                                cmd.CommandText = prefix + values;
-                                cmd.ExecuteNonQuery();
-                            }
-                        }
-                    }
-                    transaction.Commit();
-                }
-                connection.Close();
-            }
-            else
-            {
-                MessageBox.Show("Connection is not intilized", "Cannot execute SQL command", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        public void InsertImproved(List<ModelItemDB> modelItems, bool activateParallelization = true)
-        {
+            string prefix = "INSERT INTO ModelItem (ModelID, ModelItemID, DisplayName, HierachyIndex, ParentHierachyIndex, Path, Color, Mesh, Matrix, AABB, Properties, LastModifiedTime, BatchedModelItemID) VALUES ";
             object lockObject = new object();
 
             if (connection != null)

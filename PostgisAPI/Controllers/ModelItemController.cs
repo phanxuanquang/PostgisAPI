@@ -63,6 +63,11 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetAll(Guid modelid)
         {
+            if (context.ModelItems.Any(item => item.ModelID == modelid))
+            {
+                return BadRequest("Model does not exist.");
+            }
+
             ConcurrentBag<ModelItemGetDTO> modelItems = new ConcurrentBag<ModelItemGetDTO>();
             Parallel.ForEach(context.ModelItems, modelItem =>
             {
@@ -85,22 +90,59 @@ namespace PostgisAPI.Controllers
         /// <remarks>
         /// Creates a new model item using the provided data and associates it with the specified model.
         /// </remarks>
-        /// <param name="modelid">The GUID of the model to which the new model item will be associated.</param>
+        /// <param name="modelid">The GUID of the model to which the new model item to be associated.</param>
         /// <param name="modelItemDTO">The data for creating the new model item with nullable 'batchedModelItemID' field.</param>
         /// <returns>The created model item.</returns>
         /// <response code="201">The created model item.</response>
         /// <response code="400">The request data is invalid or incomplete.</response>
-        [HttpPost("create")]
+        [HttpPost("createOne")]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
         public ActionResult<ModelItem> Create(Guid modelid, ModelItemCreateDTO modelItemDTO)
         {
+            if (context.ModelItems.Any(item => item.ModelID == modelid))
+            {
+                return BadRequest("Model does not exist.");
+            }
             ModelItem modelItem = modelItemDTO.AsModelDB(modelid);
 
             context.ModelItems.Add(modelItem);
             context.SaveChanges();
 
-            return Created("Create successfully", modelItem.ModelItemID.ToString());
+            return Created("Success", modelItem.ModelItemID.ToString());
+        }
+
+        /// <summary>
+        /// Create a new list of model items
+        /// </summary>
+        /// <remarks>
+        /// Create a new list of model items associates it with the specified model.
+        /// </remarks>
+        /// <param name="modelid">The GUID of the model to which the new model items to be associated.</param>
+        /// <param name="modelItems">The list of model items with nullable 'batchedModelItemID' field.</param>
+        /// <response code="201">The status with the create items count.</response>
+        /// <response code="400">The request data is invalid or incomplete.</response>
+        [HttpPost("createMany")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        public ActionResult<ConcurrentBag<ModelItem>> Create(Guid modelid, ConcurrentBag<ModelItemCreateDTO> modelItemsDTO)
+        {
+            if (context.ModelItems.Any(item => item.ModelID == modelid))
+            {
+                return BadRequest("Model does not exist.");
+            }
+            ConcurrentBag<ModelItem> modelItems = new ConcurrentBag<ModelItem>();
+
+            Parallel.ForEach(modelItemsDTO, modelItemDTO =>
+            {
+                ModelItem modelItem = modelItemDTO.AsModelDB(modelid);
+                modelItems.Add(modelItem);
+            });
+
+            context.ModelItems.AddRange(modelItems);
+            context.SaveChanges();
+
+            return Created("Success", modelItems);
         }
 
         /// <summary>

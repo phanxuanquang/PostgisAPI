@@ -74,7 +74,7 @@ namespace PostgisUltilities
         /// Insert a list of model item into PostGIS database
         /// </summary>
         /// <param name="modelItems"></param>
-        public void InsertLinear(List<ModelItemDB> modelItems)
+        public void Insert(List<ModelItemDB> modelItems, bool useParallel = false)
         {
             if (connection != null)
             {
@@ -84,39 +84,26 @@ namespace PostgisUltilities
                     using (NpgsqlCommand cmd = new NpgsqlCommand())
                     {
                         cmd.Connection = connection;
-                        foreach (ModelItemDB modelItem in modelItems)
+                        if (useParallel)
                         {
-                            string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{"{"}{String.Join(", ", modelItem.Matrix)}{"}"}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null); \n";
-                            cmd.CommandText = prefix + values;
-                            cmd.ExecuteNonQuery();
+                            Parallel.ForEach(modelItems, modelItem =>
+                            {
+                                string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{"{"}{String.Join(", ", modelItem.Matrix)}{"}"}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null); \n";
+                                cmd.CommandText = prefix + values;
+                                cmd.ExecuteNonQuery();
+                            });
+                        }
+                        else
+                        {
+                            foreach (ModelItemDB modelItem in modelItems)
+                            {
+                                string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{"{"}{String.Join(", ", modelItem.Matrix)}{"}"}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null); \n";
+                                cmd.CommandText = prefix + values;
+                                cmd.ExecuteNonQuery();
+                            }
                         }
                     }
                     transaction.Commit();
-                }
-                connection.Close();
-            }
-            else
-            {
-                MessageBox.Show("Connection is not intilized", "Cannot execute SQL command", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        public void InsertParallel(List<ModelItemDB> modelItems)
-        {
-            if (connection != null)
-            {
-                connection.Open();
-                using (NpgsqlTransaction transaction = connection.BeginTransaction())
-                {
-                    using (NpgsqlCommand cmd = new NpgsqlCommand())
-                    {
-                        cmd.Connection = connection;
-                        Parallel.ForEach(modelItems, modelItem =>
-                        {
-                            string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{"{"}{String.Join(", ", modelItem.Matrix)}{"}"}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null); \n";
-                            cmd.CommandText = prefix + values;
-                            cmd.ExecuteNonQuery();
-                        });
-                    }
                 }
                 connection.Close();
             }

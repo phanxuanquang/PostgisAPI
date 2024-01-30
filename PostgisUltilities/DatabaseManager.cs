@@ -92,13 +92,19 @@ namespace PostgisUltilities
             int totalItem = modelItems.Count;
             try
             {
-                Parallel.Invoke(
+                Action[] functions = {
                     () => InsertByRange(modelItems, 0, totalItem / 5),
                     () => InsertByRange(modelItems, totalItem / 5, totalItem / 5 * 2),
                     () => InsertByRange(modelItems, totalItem / 5 * 2, totalItem / 5 * 3),
                     () => InsertByRange(modelItems, totalItem / 5 * 3, totalItem / 5 * 4),
                     () => InsertByRange(modelItems, totalItem / 5 * 4, totalItem)
-                );
+                };
+
+                Parallel.ForEach(functions, function =>
+                {
+                    function();
+                });
+
                 MessageBox.Show("Insert successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)

@@ -63,11 +63,6 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetAll(Guid modelid)
         {
-            if (context.ModelItems.Any(item => item.ModelID == modelid))
-            {
-                return BadRequest("Model does not exist.");
-            }
-
             ConcurrentBag<ModelItemGetDTO> modelItems = new ConcurrentBag<ModelItemGetDTO>();
             Parallel.ForEach(context.ModelItems, modelItem =>
             {
@@ -98,12 +93,8 @@ namespace PostgisAPI.Controllers
         [HttpPost("createOne")]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
-        public ActionResult<ModelItem> Create(Guid modelid, ModelItemCreateDTO modelItemDTO)
+        public ActionResult<string> Create(Guid modelid, ModelItemCreateDTO modelItemDTO)
         {
-            if (context.ModelItems.Any(item => item.ModelID == modelid))
-            {
-                return BadRequest("Model does not exist.");
-            }
             ModelItem modelItem = modelItemDTO.AsModelDB(modelid);
 
             context.ModelItems.Add(modelItem);
@@ -119,30 +110,27 @@ namespace PostgisAPI.Controllers
         /// Create a new list of model items associates it with the specified model.
         /// </remarks>
         /// <param name="modelid">The GUID of the model to which the new model items to be associated.</param>
-        /// <param name="modelItems">The list of model items with nullable 'batchedModelItemID' field.</param>
+        /// <param name="modelItemsDTO">The list of model items with nullable 'batchedModelItemID' field.</param>
         /// <response code="201">The status with the create items count.</response>
         /// <response code="400">The request data is invalid or incomplete.</response>
         [HttpPost("createMany")]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
-        public ActionResult<ConcurrentBag<ModelItem>> Create(Guid modelid, ConcurrentBag<ModelItemCreateDTO> modelItemsDTO)
+        public ActionResult<string> Create(Guid modelid, List<ModelItemCreateDTO> modelItemsDTO)
         {
-            if (context.ModelItems.Any(item => item.ModelID == modelid))
-            {
-                return BadRequest("Model does not exist.");
-            }
+            ConcurrentBag<ModelItemCreateDTO> items = new ConcurrentBag<ModelItemCreateDTO>(modelItemsDTO);
             ConcurrentBag<ModelItem> modelItems = new ConcurrentBag<ModelItem>();
 
-            Parallel.ForEach(modelItemsDTO, modelItemDTO =>
+            Parallel.ForEach(items, item =>
             {
-                ModelItem modelItem = modelItemDTO.AsModelDB(modelid);
+                ModelItem modelItem = item.AsModelDB(modelid);
                 modelItems.Add(modelItem);
             });
 
             context.ModelItems.AddRange(modelItems);
             context.SaveChanges();
 
-            return Created("Success", modelItems);
+            return Created("Success", $"Created model items: {modelItems.Count()}");
         }
 
         /// <summary>
@@ -372,8 +360,8 @@ namespace PostgisAPI.Controllers
             else
             {
                 List<ModelItem> modelItemsToUpdate = await context.ModelItems
-                .Where(item => item.ModelID == modelId)
-                .ToListAsync();
+                                                    .Where(item => item.ModelID == modelId)
+                                                    .ToListAsync();
 
                 if (modelItemsToUpdate == null || modelItemsToUpdate.Count == 0)
                 {

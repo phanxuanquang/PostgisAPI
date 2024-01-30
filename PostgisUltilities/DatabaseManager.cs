@@ -1,5 +1,6 @@
 ﻿using Npgsql;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Runtime.InteropServices;
@@ -77,6 +78,7 @@ namespace PostgisUltilities
         /// <param name="activateParallelization">Apply the parallelization (default value is True). Larger the model, higher the performance.</param>
         public void Insert(List<ModelItemDB> modelItems, bool activateParallelization = true)
         {
+            object lockObject = new object();
             if (connection != null)
             {
                 connection.Open();
@@ -89,9 +91,12 @@ namespace PostgisUltilities
                         {
                             Parallel.ForEach(modelItems, modelItem =>
                             {
-                                string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{"{"}{String.Join(", ", modelItem.Matrix)}{"}"}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null); \n";
-                                cmd.CommandText = prefix + values;
-                                cmd.ExecuteNonQuery();
+                                lock (lockObject)
+                                {
+                                    string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{"{"}{String.Join(", ", modelItem.Matrix)}{"}"}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null); \n";
+                                    cmd.CommandText = prefix + values;
+                                    cmd.ExecuteNonQuery();
+                                }
                             });
                         }
                         else

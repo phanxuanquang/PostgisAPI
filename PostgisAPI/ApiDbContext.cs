@@ -8,7 +8,10 @@ namespace PostgisAPI
         public DbSet<ModelItem> ModelItems { get; set; }
         public DbSet<Model> Models { get; set; }
 
-        public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
+        public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)
+        {
+
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

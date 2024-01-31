@@ -1,10 +1,5 @@
 ﻿using Npgsql;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace PostgisUltilities
@@ -27,8 +22,6 @@ namespace PostgisUltilities
             connection = new NpgsqlConnection(connectionString);
 
         }
-        [DllImport("kernel32")]
-        private static extern bool AllocConsole();
         #region Private Executers
 
         /// <summary>
@@ -70,74 +63,5 @@ namespace PostgisUltilities
             }
         }
         #endregion
-
-        /// <summary>
-        /// Insert a list of model item into PostGIS database
-        /// </summary>
-        /// <param name="modelItems">The model item list to be inserted</param>
-        /// <param name="activateParallelization">Apply the parallelization (default value is True). Larger the model, higher the performance.</param>
-        public void Insert(List<ModelItemDB> modelItems, bool activateParallelization = true)
-        {
-            string prefix = "INSERT INTO ModelItem (ModelID, ModelItemID, DisplayName, HierachyIndex, ParentHierachyIndex, Path, Color, Mesh, Matrix, AABB, Properties, LastModifiedTime, BatchedModelItemID) VALUES ";
-            object lockObject = new object();
-
-            if (connection != null)
-            {
-                connection.Open();
-
-                try
-                {
-                    using (NpgsqlTransaction transaction = connection.BeginTransaction())
-                    using (NpgsqlCommand cmd = new NpgsqlCommand())
-                    {
-                        cmd.Connection = connection;
-                        cmd.Transaction = transaction;
-
-                        if (activateParallelization)
-                        {
-                            Parallel.ForEach(Partitioner.Create(0, modelItems.Count), range =>
-                            {
-                                StringBuilder batchCommand = new StringBuilder();
-
-                                for (int i = range.Item1; i < range.Item2; i++)
-                                {
-                                    ModelItemDB modelItem = modelItems[i];
-
-                                    string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{"{"}{String.Join(", ", modelItem.Matrix)}{"}"}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null)";
-
-                                    batchCommand.AppendLine(prefix + values + ";");
-                                }
-
-                                lock (lockObject)
-                                {
-                                    cmd.CommandText = batchCommand.ToString();
-                                    cmd.ExecuteNonQuery();
-                                }
-                            });
-                        }
-                        else
-                        {
-                            foreach (ModelItemDB modelItem in modelItems)
-                            {
-                                string values = $"('{modelItem.ModelID}', '{modelItem.ModelItemID}', '{modelItem.DisplayName.Replace("'", "")}', {modelItem.HierarchyIndex}, {modelItem.ParentHierachyIndex}, '{modelItem.Path}', '{modelItem.Color}', '{modelItem.Mesh}', '{"{"}{String.Join(", ", modelItem.Matrix)}{"}"}', '{modelItem.AABB}', '{modelItem.Properties.Replace("'", "")}', '{modelItem.LastModifiedTime}', null)";
-
-                                cmd.CommandText = prefix + values + ";";
-                                cmd.ExecuteNonQuery();
-                            }
-                        }
-
-                        transaction.Commit();
-                    }
-                }
-                finally
-                {
-                    connection.Close();
-                }
-            }
-            else
-            {
-                MessageBox.Show("Connection is not initialized", "Cannot execute SQL command", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
     }
 }

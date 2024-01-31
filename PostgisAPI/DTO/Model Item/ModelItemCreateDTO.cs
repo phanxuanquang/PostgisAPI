@@ -9,7 +9,6 @@ namespace PostgisAPI.DTO
         public int HierarchyIndex { get; set; }
         public int ParentHierachyIndex { get; set; }
         public string DisplayName { get; set; }
-        public string Path { get; set; }
         public Color Color { get; set; }
         public Mesh Mesh { get; set; }
         public double[]? Matrix { get; set; }
@@ -28,10 +27,8 @@ namespace PostgisAPI.DTO
                 ModelID = ModelID,
                 BatchedModelItemID = BatchedModelItemID,
                 DisplayName = DisplayName,
-                Path = Path,
                 Color = Color.AsJson(),
                 Matrix = Matrix,
-                AABB = AABB.AsJson(),
                 Mesh = Mesh.AsJson(),
                 Properties = Properties,
                 LastModifiedTime = DateTime.Now,

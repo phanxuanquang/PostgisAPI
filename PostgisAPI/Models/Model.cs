@@ -14,8 +14,6 @@ namespace PostgisAPI.Models
         public Guid ModelID { get; set; } = Guid.NewGuid();
         [Column("displayname")]
         public string DisplayName { get; set; }
-        [Column("aabb", TypeName = "jsonb")]
-        public string AABB { get; set; }
         [Column("lastmodifiedtime")]
         public DateTime LastModifiedTime { get; set; } = DateTime.Now;
 
@@ -25,7 +23,6 @@ namespace PostgisAPI.Models
             {
                 ModelID = ModelID,
                 DisplayName = DisplayName,
-                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(AABB),
                 LastModifiedTime = LastModifiedTime
             };
         }

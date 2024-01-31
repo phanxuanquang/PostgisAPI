@@ -26,16 +26,12 @@ namespace PostgisAPI.Models
 
         [Column("displayname")]
         public string DisplayName { get; set; }
-        [Column("path")]
-        public string Path { get; set; }
         [Column("color", TypeName = "jsonb")]
         public string Color { get; set; }
         [Column("mesh", TypeName = "jsonb")]
         public string Mesh { get; set; }
         [Column("matrix", TypeName = "real[]")]
         public double[] Matrix { get; set; }
-        [Column("aabb", TypeName = "jsonb")]
-        public string? AABB { get; set; }
         [Column("batchedmodelitemid")]
         public Guid? BatchedModelItemID { get; set; }
         [Column("properties")]
@@ -54,11 +50,9 @@ namespace PostgisAPI.Models
                 HierarchyIndex = HierarchyIndex,
                 ParentHierachyIndex = ParentHierachyIndex,
                 DisplayName = DisplayName,
-                Path = Path,
                 Color = JsonConvert.DeserializeObject<Color>(Color),
                 Mesh = JsonConvert.DeserializeObject<Mesh>(Mesh),
                 Matrix = Matrix,
-                AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(AABB),
                 BatchedModelItemID = BatchedModelItemID,
                 Properties = Properties,
                 LastModifiedTime = LastModifiedTime,

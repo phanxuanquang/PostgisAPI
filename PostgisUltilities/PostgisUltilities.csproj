@@ -161,14 +161,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bounding Boxes\AxisAlignedBoundingBox.cs" />
-    <Compile Include="Bounding Boxes\AabbAsGeo.cs" />
-    <Compile Include="ModelDB.cs" />
+    <Compile Include="DatabaseModels\Model.cs" />
     <Compile Include="Supporter\Color.cs" />
     <Compile Include="DatabaseManager.cs" />
     <Compile Include="GeometryHelper.cs" />
     <Compile Include="Bounding Boxes\OrientedBoundingBox.cs" />
     <Compile Include="Supporter\Mesh.cs" />
-    <Compile Include="ModelItemDB.cs" />
+    <Compile Include="DatabaseModels\ModelItem.cs" />
     <Compile Include="Supporter\PointZ.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -177,7 +176,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BulkCopyConfig.xml" />
     <Content Include="libpqDLL\8.x\x64\comerr32.dll" />
     <Content Include="libpqDLL\8.x\x64\gssapi32.dll" />
     <Content Include="libpqDLL\8.x\x64\iconv.dll" />
@@ -224,8 +222,8 @@
     <Content Include="libpqDLL\9.x\x86\PgCPP.DLL.9.x.dll" />
     <Content Include="libpqDLL\9.x\x86\ssleay32.dll" />
     <Content Include="libpqDLL\9.x\x86\zlib1.dll" />
-    <Content Include="Readme!!!.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy PostgisUltilities.dll ..\..\..\Includes</PostBuildEvent>

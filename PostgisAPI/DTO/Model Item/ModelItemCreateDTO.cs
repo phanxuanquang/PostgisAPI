@@ -1,6 +1,4 @@
-﻿using PostgisAPI.Models;
-using PostgisUltilities;
-using PostgisUltilities.Bounding_Boxes;
+﻿using PostgisUltilities;
 
 namespace PostgisAPI.DTO
 {
@@ -17,10 +15,9 @@ namespace PostgisAPI.DTO
         public string Properties { get; set; }
         public int? FeatureID { get; set; }
         public int? GlbIndex { get; set; }
-
-        public ModelItem AsModelDB(Guid ModelID)
+        public Models.ModelItem AsModelDB(Guid ModelID)
         {
-            return new ModelItem
+            return new Models.ModelItem
             {
                 ModelItemID = Guid.NewGuid(),
                 HierarchyIndex = HierarchyIndex,

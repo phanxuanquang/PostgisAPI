@@ -1,6 +1,8 @@
 ﻿using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace PostgisUltilities
 {
@@ -17,7 +19,6 @@ namespace PostgisUltilities
         {
             return JsonConvert.SerializeObject(this);
         }
-
         public Geometry AsGeometry()
         {
             CoordinateZ AsCoordinateZ(PointZ point)
@@ -38,6 +39,18 @@ namespace PostgisUltilities
 
             return geometryFactory.CreatePolygon(linearRing);
         }
+        public string AsWKT()
+        {
+            try
+            {
+                return AsGeometry().AsText();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Cannot generate well-known text from the mesh", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
+        }
 
         public bool TouchedBy(PointZ hitPoint)
         {
@@ -55,6 +68,10 @@ namespace PostgisUltilities
         public OrientedBoundingBox GetObb()
         {
             return new OrientedBoundingBox(AsGeometry());
+        }
+        public AxisAlignedBoundingBox GetAabb()
+        {
+            return new AxisAlignedBoundingBox(AsGeometry());
         }
     }
 }

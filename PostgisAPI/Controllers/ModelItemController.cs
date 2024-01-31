@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PostgisAPI.DTO;
-using PostgisAPI.Models;
 using PostgisUltilities;
 using System.Collections.Concurrent;
 
@@ -37,7 +36,7 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(404)]
         public ActionResult<ModelItemGetDTO> GetByGuid(Guid modelitemid)
         {
-            ModelItem? modelItem = context.ModelItems.AsParallel().FirstOrDefault(item => item.ModelItemID == modelitemid);
+            Models.ModelItem? modelItem = context.ModelItems.AsParallel().FirstOrDefault(item => item.ModelItemID == modelitemid);
 
             if (modelItem == null)
             {
@@ -94,7 +93,7 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(400)]
         public ActionResult<string> Create(Guid modelid, ModelItemCreateDTO modelItemDTO)
         {
-            ModelItem modelItem = modelItemDTO.AsModelDB(modelid);
+            Models.ModelItem modelItem = modelItemDTO.AsModelDB(modelid);
 
             context.ModelItems.Add(modelItem);
             context.SaveChanges();
@@ -118,11 +117,11 @@ namespace PostgisAPI.Controllers
         public ActionResult<string> Create(Guid modelid, List<ModelItemCreateDTO> modelItemsDTO)
         {
             ConcurrentBag<ModelItemCreateDTO> items = new ConcurrentBag<ModelItemCreateDTO>(modelItemsDTO);
-            ConcurrentBag<ModelItem> modelItems = new ConcurrentBag<ModelItem>();
+            ConcurrentBag<Models.ModelItem> modelItems = new ConcurrentBag<Models.ModelItem>();
 
             Parallel.ForEach(items, item =>
             {
-                ModelItem modelItem = item.AsModelDB(modelid);
+                Models.ModelItem modelItem = item.AsModelDB(modelid);
                 modelItems.Add(modelItem);
             });
 
@@ -148,7 +147,7 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(404)]
         public ActionResult<ModelItemGetDTO> GetByHitPoint(Guid modelid, PointZ hitPoint)
         {
-            foreach (ModelItem modelItem in context.ModelItems)
+            foreach (Models.ModelItem modelItem in context.ModelItems)
             {
                 if (modelItem.ModelID == modelid && modelItem.AsDTO().Mesh.TouchedBy(hitPoint))
                 {
@@ -220,7 +219,7 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(404)]
         public ActionResult<ModelItemGetDTO> GetByHierachyIndex(Guid modelid, int hierachyindex = 0)
         {
-            ModelItem? modelItem = context.ModelItems.AsParallel().FirstOrDefault(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+            Models.ModelItem? modelItem = context.ModelItems.AsParallel().FirstOrDefault(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)
             {
@@ -241,7 +240,7 @@ namespace PostgisAPI.Controllers
         [HttpPut("hierarchyIndex")]
         public async Task<IActionResult> Update(Guid modelid, int hierachyindex, [FromBody] ModelItemCreateDTO modelItemDTO)
         {
-            ModelItem? modelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+            Models.ModelItem? modelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)
             {
@@ -269,9 +268,9 @@ namespace PostgisAPI.Controllers
         [HttpPatch("hierarchyIndex")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> Patch(Guid modelid, int hierachyindex, [FromBody] JsonPatchDocument<ModelItem> patchData)
+        public async Task<IActionResult> Patch(Guid modelid, int hierachyindex, [FromBody] JsonPatchDocument<Models.ModelItem> patchData)
         {
-            ModelItem? modelItem = await context.ModelItems.Where(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex).FirstAsync();
+            Models.ModelItem? modelItem = await context.ModelItems.Where(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex).FirstAsync();
 
             if (modelItem == null)
             {
@@ -301,7 +300,7 @@ namespace PostgisAPI.Controllers
         [HttpDelete("hierarchyIndex")]
         public async Task<IActionResult> Delete(Guid modelid, int hierachyindex)
         {
-            ModelItem? modelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
+            Models.ModelItem? modelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
             if (modelItem == null)
             {
@@ -358,7 +357,7 @@ namespace PostgisAPI.Controllers
             }
             else
             {
-                List<ModelItem> modelItemsToUpdate = await context.ModelItems
+                List<Models.ModelItem> modelItemsToUpdate = await context.ModelItems
                                                     .Where(item => item.ModelID == modelId)
                                                     .ToListAsync();
 
@@ -367,7 +366,7 @@ namespace PostgisAPI.Controllers
                     return NotFound("Not Found");
                 }
 
-                foreach (ModelItem? modelItem in modelItemsToUpdate)
+                foreach (Models.ModelItem? modelItem in modelItemsToUpdate)
                 {
                     if (modelItemBatchedModelItemPairs.TryGetValue(modelItem.ModelItemID, out Guid? batchedModelItemId))
                     {

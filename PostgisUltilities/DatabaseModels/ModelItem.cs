@@ -2,7 +2,7 @@
 
 namespace PostgisUltilities
 {
-    public class ModelItemDB
+    public class ModelItem
     {
         public int HierarchyIndex { get; set; }
         public Guid ModelID { get; set; }
@@ -18,7 +18,10 @@ namespace PostgisUltilities
         public int? FeatureID;
         public int? GlbIndex;
 
-        public ModelItemDB(int hierarchyIndex, Guid modelID, Guid modelItemID, int parentHierachyIndex, string displayName, string color, string mesh, double[] matrix, Guid? batchedModelItemID, string properties, DateTime lastModifiedTime, int? featureID, int? glbIndex)
+        /// <summary>
+        /// Create a new model item
+        /// </summary>
+        public ModelItem(int hierarchyIndex, Guid modelID, Guid modelItemID, int parentHierachyIndex, string displayName, string color, string mesh, double[] matrix, Guid? batchedModelItemID, string properties, DateTime lastModifiedTime, int? featureID, int? glbIndex)
         {
             HierarchyIndex = hierarchyIndex;
             ModelID = modelID;

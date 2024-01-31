@@ -31,23 +31,17 @@ namespace PostgisUltilities
         }
 
         /// <summary>
-        /// Get the oriented bounding box of a specific geometry
-        /// </summary>
-        /// <param name="geometry">Input geometry</param>
-        /// <returns>The oriented bounding box of the input geometry</returns>
-        public OrientedBoundingBox GetObbOf(Geometry geometry)
-        {
-            return new OrientedBoundingBox(geometry);
-        }
-
-        /// <summary>
         /// Get the oriented bounding box of a specific geometry set
         /// </summary>
         /// <param name="geometries">Input geometry set</param>
         /// <returns>The oriented bounding box of the input geometry set</returns>
         public OrientedBoundingBox GetObbOf(List<Geometry> geometries)
         {
-            return new OrientedBoundingBox(CreateMergedGeometryFrom(geometries));
+            return new OrientedBoundingBox(MergeGeometryFrom(geometries));
+        }
+        public AxisAlignedBoundingBox GetAabbOf(List<Geometry> geometries)
+        {
+            return new AxisAlignedBoundingBox(MergeGeometryFrom(geometries));
         }
 
         /// <summary>
@@ -161,7 +155,7 @@ namespace PostgisUltilities
         /// </summary>
         /// <param name="geometries">The geometry set</param>
         /// <returns>The unified geometry</returns>
-        public Geometry CreateMergedGeometryFrom(List<Geometry> geometries)
+        public Geometry MergeGeometryFrom(List<Geometry> geometries)
         {
             GeometryFactory geometryFactory = new GeometryFactory();
             Geometry[] geometryArray = geometries.ToArray();
@@ -217,20 +211,17 @@ namespace PostgisUltilities
         /// </summary>
         /// <param name="geometry">The input geometry.</param>
         /// <returns>The Well-Known Text representation of the geometry.</returns>
-        public string ST_AsText(Geometry geometry)
+        public string ST_AsText(List<Geometry> geos)
         {
-            string text = String.Empty;
-
             try
             {
-                text = geometry.AsText();
+                return MergeGeometryFrom(geos).AsText();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Cannot generate text from geometry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
-
-            return text;
         }
 
         /// <summary>
@@ -242,7 +233,6 @@ namespace PostgisUltilities
         {
             return geometry.OgcGeometryType;
         }
-
         #endregion
 
         #region Geometric Methods

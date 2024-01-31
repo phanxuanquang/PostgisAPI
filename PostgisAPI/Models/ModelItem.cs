@@ -42,6 +42,8 @@ namespace PostgisAPI.Models
         public string Properties { get; set; }
         [Column("lastmodifiedtime")]
         public DateTime LastModifiedTime { get; set; } = DateTime.Now;
+        [Column("featureid")]
+        public int? FeatureID;
 
         public ModelItemGetDTO AsDTO()
         {
@@ -59,7 +61,8 @@ namespace PostgisAPI.Models
                 AABB = JsonConvert.DeserializeObject<AxisAlignedBoundingBox>(AABB),
                 BatchedModelItemID = BatchedModelItemID,
                 Properties = Properties,
-                LastModifiedTime = LastModifiedTime
+                LastModifiedTime = LastModifiedTime,
+                FeatureID = FeatureID,
             };
         }
     }

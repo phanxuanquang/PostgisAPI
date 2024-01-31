@@ -16,6 +16,7 @@ namespace PostgisAPI.DTO
         public AxisAlignedBoundingBox? AABB { get; set; }
         public Guid? BatchedModelItemID { get; set; }
         public string Properties { get; set; }
+        public int? FeatureID { get; set; }
 
         public ModelItem AsModelDB(Guid ModelID)
         {
@@ -33,8 +34,8 @@ namespace PostgisAPI.DTO
                 AABB = AABB.AsJson(),
                 Mesh = Mesh.AsJson(),
                 Properties = Properties,
-                LastModifiedTime = DateTime.Now
-
+                LastModifiedTime = DateTime.Now,
+                FeatureID = FeatureID,
             };
         }
     }

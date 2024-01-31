@@ -160,6 +160,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiHelper.cs" />
     <Compile Include="Bounding Boxes\AxisAlignedBoundingBox.cs" />
     <Compile Include="DatabaseModels\Model.cs" />
     <Compile Include="Supporter\Color.cs" />

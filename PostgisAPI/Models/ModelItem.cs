@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using PostgisAPI.DTO;
 using PostgisUltilities;
-using PostgisUltilities.Bounding_Boxes;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PostgisAPI.Models
@@ -40,6 +39,8 @@ namespace PostgisAPI.Models
         public DateTime LastModifiedTime { get; set; } = DateTime.Now;
         [Column("featureid")]
         public int? FeatureID;
+        [Column("glbindex")]
+        public int? GlbIndex;
 
         public ModelItemGetDTO AsDTO()
         {
@@ -57,6 +58,7 @@ namespace PostgisAPI.Models
                 Properties = Properties,
                 LastModifiedTime = LastModifiedTime,
                 FeatureID = FeatureID,
+                GlbIndex = GlbIndex,
             };
         }
     }

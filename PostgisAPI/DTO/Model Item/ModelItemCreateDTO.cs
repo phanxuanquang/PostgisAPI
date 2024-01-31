@@ -16,6 +16,7 @@ namespace PostgisAPI.DTO
         public Guid? BatchedModelItemID { get; set; }
         public string Properties { get; set; }
         public int? FeatureID { get; set; }
+        public int? GlbIndex { get; set; }
 
         public ModelItem AsModelDB(Guid ModelID)
         {
@@ -33,6 +34,7 @@ namespace PostgisAPI.DTO
                 Properties = Properties,
                 LastModifiedTime = DateTime.Now,
                 FeatureID = FeatureID,
+                GlbIndex = GlbIndex,
             };
         }
     }

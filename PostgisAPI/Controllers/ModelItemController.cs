@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Index.HPRtree;
 using PostgisAPI.DTO;
 using PostgisAPI.Models;
 using PostgisUltilities;
@@ -333,7 +332,7 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(500, Type = typeof(string))]
         public async Task<IActionResult> BatchModelItems(Guid modelId, [FromBody] Dictionary<Guid, Guid?> modelItemBatchedModelItemPairs)
         {
-            if(modelItemBatchedModelItemPairs.Count > 5000)
+            if (modelItemBatchedModelItemPairs.Count > 5000)
             {
                 ConcurrentBag<ModelItemGetDTO> modelItemsToUpdate = new ConcurrentBag<ModelItemGetDTO>();
                 Parallel.ForEach(context.ModelItems, modelItem =>

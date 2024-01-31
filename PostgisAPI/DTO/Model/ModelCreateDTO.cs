@@ -1,6 +1,4 @@
-﻿using PostgisUltilities.Bounding_Boxes;
-
-namespace PostgisAPI.DTO.Model
+﻿namespace PostgisAPI.DTO.Model
 {
     public class ModelCreateDTO
     {

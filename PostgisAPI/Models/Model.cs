@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using PostgisAPI.DTO.Model;
-using PostgisUltilities.Bounding_Boxes;
+﻿using PostgisAPI.DTO.Model;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PostgisAPI.Models

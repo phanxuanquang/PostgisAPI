@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +12,7 @@ namespace PostgisUltilities
     public class DatabaseManager
     {
         private NpgsqlConnection connection;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseManager"/> class with the specified connection parameters.
         /// </summary>

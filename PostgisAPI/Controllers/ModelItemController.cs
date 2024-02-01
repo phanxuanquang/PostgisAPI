@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PostgisAPI.DTO;
 using PostgisUltilities;
 using System.Collections.Concurrent;
 
@@ -34,7 +33,7 @@ namespace PostgisAPI.Controllers
         [HttpGet("guid")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public ActionResult<ModelItemGetDTO> GetByGuid(Guid modelitemid)
+        public ActionResult<DTO.ModelItemGetDTO> GetByGuid(Guid modelitemid)
         {
             Models.ModelItem? modelItem = context.ModelItems.AsParallel().FirstOrDefault(item => item.ModelItemID == modelitemid);
 
@@ -61,7 +60,7 @@ namespace PostgisAPI.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetAll(Guid modelid)
         {
-            ConcurrentBag<ModelItemGetDTO> modelItems = new ConcurrentBag<ModelItemGetDTO>();
+            ConcurrentBag<DTO.ModelItemGetDTO> modelItems = new ConcurrentBag<DTO.ModelItemGetDTO>();
             Parallel.ForEach(context.ModelItems, modelItem =>
             {
                 if (modelItem.ModelID == modelid)
@@ -91,7 +90,7 @@ namespace PostgisAPI.Controllers
         [HttpPost("createOne")]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
-        public ActionResult<string> Create(Guid modelid, ModelItemCreateDTO modelItemDTO)
+        public ActionResult<string> Create(Guid modelid, DTO.ModelItemCreateDTO modelItemDTO)
         {
             Models.ModelItem modelItem = modelItemDTO.AsModelDB(modelid);
 
@@ -114,9 +113,9 @@ namespace PostgisAPI.Controllers
         [HttpPost("createMany")]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
-        public ActionResult<string> Create(Guid modelid, List<ModelItemCreateDTO> modelItemsDTO)
+        public ActionResult<string> Create(Guid modelid, List<DTO.ModelItemCreateDTO> modelItemsDTO)
         {
-            ConcurrentBag<ModelItemCreateDTO> items = new ConcurrentBag<ModelItemCreateDTO>(modelItemsDTO);
+            ConcurrentBag<DTO.ModelItemCreateDTO> items = new ConcurrentBag<DTO.ModelItemCreateDTO>(modelItemsDTO);
             ConcurrentBag<Models.ModelItem> modelItems = new ConcurrentBag<Models.ModelItem>();
 
             Parallel.ForEach(items, item =>
@@ -145,7 +144,7 @@ namespace PostgisAPI.Controllers
         [HttpPost("findByHitPoint")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public ActionResult<ModelItemGetDTO> GetByHitPoint(Guid modelid, PointZ hitPoint)
+        public ActionResult<DTO.ModelItemGetDTO> GetByHitPoint(Guid modelid, PointZ hitPoint)
         {
             foreach (Models.ModelItem modelItem in context.ModelItems)
             {
@@ -171,9 +170,9 @@ namespace PostgisAPI.Controllers
         [HttpGet("batchedModelItem")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public ActionResult<IEnumerable<ModelItemGetDTO>> GetByBatchedModelItem(Guid modelid, Guid? batchedmodelitemid)
+        public ActionResult<IEnumerable<DTO.ModelItemGetDTO>> GetByBatchedModelItem(Guid modelid, Guid? batchedmodelitemid)
         {
-            ConcurrentBag<ModelItemGetDTO> modelItems = new ConcurrentBag<ModelItemGetDTO>();
+            ConcurrentBag<DTO.ModelItemGetDTO> modelItems = new ConcurrentBag<DTO.ModelItemGetDTO>();
             if (batchedmodelitemid == null)
             {
                 Parallel.ForEach(context.ModelItems, item =>
@@ -217,7 +216,7 @@ namespace PostgisAPI.Controllers
         [HttpGet("hierarchyIndex")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public ActionResult<ModelItemGetDTO> GetByHierachyIndex(Guid modelid, int hierachyindex = 0)
+        public ActionResult<DTO.ModelItemGetDTO> GetByHierachyIndex(Guid modelid, int hierachyindex = 0)
         {
             Models.ModelItem? modelItem = context.ModelItems.AsParallel().FirstOrDefault(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
@@ -238,7 +237,7 @@ namespace PostgisAPI.Controllers
         /// <param name="modelItemDTO"></param>
         /// <returns></returns>
         [HttpPut("hierarchyIndex")]
-        public async Task<IActionResult> Update(Guid modelid, int hierachyindex, [FromBody] ModelItemCreateDTO modelItemDTO)
+        public async Task<IActionResult> Update(Guid modelid, int hierachyindex, [FromBody] DTO.ModelItemCreateDTO modelItemDTO)
         {
             Models.ModelItem? modelItem = await context.ModelItems.FirstOrDefaultAsync(item => item.ModelID == modelid && item.HierarchyIndex == hierachyindex);
 
@@ -333,7 +332,7 @@ namespace PostgisAPI.Controllers
         {
             if (modelItemBatchedModelItemPairs.Count > 5000)
             {
-                ConcurrentBag<ModelItemGetDTO> modelItemsToUpdate = new ConcurrentBag<ModelItemGetDTO>();
+                ConcurrentBag<DTO.ModelItemGetDTO> modelItemsToUpdate = new ConcurrentBag<DTO.ModelItemGetDTO>();
                 Parallel.ForEach(context.ModelItems, modelItem =>
                 {
                     if (modelItem.ModelID == modelId)

@@ -17,25 +17,5 @@ namespace PostgisUltilities
         public DateTime LastModifiedTime { get; set; }
         public int? FeatureID;
         public int? GlbIndex;
-
-        /// <summary>
-        /// Create a new model item
-        /// </summary>
-        public ModelItem(int hierarchyIndex, Guid modelID, Guid modelItemID, int parentHierachyIndex, string displayName, string color, string mesh, double[] matrix, Guid? batchedModelItemID, string properties, DateTime lastModifiedTime, int? featureID, int? glbIndex)
-        {
-            HierarchyIndex = hierarchyIndex;
-            ModelID = modelID;
-            ModelItemID = modelItemID;
-            ParentHierachyIndex = parentHierachyIndex;
-            DisplayName = displayName;
-            Color = color;
-            Mesh = mesh;
-            Matrix = matrix;
-            BatchedModelItemID = batchedModelItemID;
-            Properties = properties;
-            LastModifiedTime = lastModifiedTime;
-            FeatureID = featureID;
-            GlbIndex = glbIndex;
-        }
     }
 }

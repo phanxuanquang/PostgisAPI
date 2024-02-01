@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,9 +13,9 @@ namespace PostgisUltilities
         {
             this.baseUrl = baseUrl;
         }
-        private async Task<string> Get(string route)
+        private async Task<string> Get(string header)
         {
-            string endpoint = baseUrl + route;
+            string endpoint = baseUrl + header;
 
             using (HttpClient client = new HttpClient())
             {
@@ -34,9 +32,9 @@ namespace PostgisUltilities
             }
         }
 
-        private async void Post(string route, string bodyAsJson)
+        private async void Post(string header, string bodyAsJson)
         {
-            string endpoint = baseUrl + route;
+            string endpoint = baseUrl + header;
             using (HttpClient client = new HttpClient())
             {
                 StringContent body = new StringContent(bodyAsJson, Encoding.UTF8, "application/json-patch+json");

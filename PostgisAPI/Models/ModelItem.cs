@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using PostgisAPI.DTO;
 using PostgisUltilities;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -42,9 +41,9 @@ namespace PostgisAPI.Models
         [Column("glbindex")]
         public int? GlbIndex;
 
-        public ModelItemGetDTO AsDTO()
+        public DTO.ModelItemGetDTO AsDTO()
         {
-            return new ModelItemGetDTO
+            return new DTO.ModelItemGetDTO
             {
                 ModelID = ModelID,
                 ModelItemID = ModelItemID,

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PostgisUltilities</RootNamespace>
     <AssemblyName>PostgisUltilities</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -163,6 +163,10 @@
     <Compile Include="ApiHelper.cs" />
     <Compile Include="Bounding Boxes\AxisAlignedBoundingBox.cs" />
     <Compile Include="DatabaseModels\Model.cs" />
+    <Compile Include="DTO\ModelCreateDTO.cs" />
+    <Compile Include="DTO\ModelGetDTO.cs" />
+    <Compile Include="DTO\ModelItemCreateDTO.cs" />
+    <Compile Include="DTO\ModelItemGetDTO.cs" />
     <Compile Include="Supporter\Color.cs" />
     <Compile Include="DatabaseManager.cs" />
     <Compile Include="GeometryHelper.cs" />

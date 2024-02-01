@@ -1,6 +1,7 @@
-﻿using PostgisUltilities;
+﻿using Newtonsoft.Json;
+using System;
 
-namespace PostgisAPI.DTO
+namespace PostgisUltilities
 {
     public class ModelItemCreateDTO
     {
@@ -14,9 +15,13 @@ namespace PostgisAPI.DTO
         public string Properties { get; set; }
         public int? FeatureID { get; set; }
         public int? GlbIndex { get; set; }
-        public Models.ModelItem AsModelDB(Guid ModelID)
+        public string AsJson()
         {
-            return new Models.ModelItem
+            return JsonConvert.SerializeObject(this);
+        }
+        public ModelItem AsModelDB(Guid ModelID)
+        {
+            return new ModelItem
             {
                 ModelItemID = Guid.NewGuid(),
                 HierarchyIndex = HierarchyIndex,

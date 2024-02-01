@@ -52,13 +52,12 @@ namespace PostgisUltilities
             using (HttpClient client = new HttpClient())
             {
                 StringContent content = new StringContent(bodyAsJson, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.PostAsync(endpoint, content);
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
+                    await client.PostAsync(endpoint, content);
                     MessageBox.Show("Post data to the database successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                else
+                catch (Exception ex)
                 {
                     MessageBox.Show("Post data to the database failed.", $"Failed: {header}", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }

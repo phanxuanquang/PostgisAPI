@@ -14,7 +14,7 @@ namespace Tester
         private async void TestBtn(object sender, EventArgs e)
         {
             ApiHelper apiHelper = new ApiHelper();
-            apiHelper.baseUrl = $"https://localhost:7186";
+            apiHelper.baseUrl = $"https://localhost:44303";
             apiHelper.Post($"{endpointBox.Text}", bodyBox.Text);
         }
     }

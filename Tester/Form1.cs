@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PostgisUltilities;
+using System;
 using System.Windows.Forms;
 
 namespace Tester
@@ -10,9 +11,11 @@ namespace Tester
             InitializeComponent();
         }
 
-        private void TestBtn(object sender, EventArgs e)
+        private async void TestBtn(object sender, EventArgs e)
         {
-
+            ApiHelper apiHelper = new ApiHelper();
+            apiHelper.baseUrl = $"https://localhost:7186";
+            apiHelper.Post($"{endpointBox.Text}", bodyBox.Text);
         }
     }
 }

@@ -8,12 +8,9 @@ namespace PostgisUltilities
 {
     public class ApiHelper
     {
-        private string baseUrl;
-        public ApiHelper(string baseUrl)
-        {
-            this.baseUrl = baseUrl;
-        }
-        private async Task<string> Get(string header)
+        public string baseUrl;
+        public ApiHelper() { }
+        public async Task<string> Get(string header)
         {
             string endpoint = baseUrl + header;
 
@@ -32,21 +29,21 @@ namespace PostgisUltilities
             }
         }
 
-        private async void Post(string header, string bodyAsJson)
+        public async void Post(string header, string bodyAsJson)
         {
-            string endpoint = baseUrl + header;
+            string endpoint = $"{baseUrl}{header}";
             using (HttpClient client = new HttpClient())
             {
-                StringContent body = new StringContent(bodyAsJson, Encoding.UTF8, "application/json-patch+json");
+                StringContent content = new StringContent(bodyAsJson, Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.PostAsync(endpoint, content);
 
-                try
+                if (response.IsSuccessStatusCode)
                 {
-                    HttpResponseMessage response = await client.PostAsync(endpoint, body);
                     MessageBox.Show("Post data to the database successfully.", "Post data successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show(ex.Message, $"Failed: {endpoint}", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Post data to the database failed.", $"Failed: {endpoint}", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }

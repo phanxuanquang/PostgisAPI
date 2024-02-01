@@ -26,6 +26,10 @@ namespace PostgisUltilities
                 return new CoordinateZ(point.x, point.y, point.z);
             }
 
+            if (vertices.Count == 0 || faceIndexes.Count == 0)
+            {
+                return null;
+            }
             List<CoordinateZ> fullVertices = new List<CoordinateZ>();
             for (int i = 0; i < faceIndexes.Count; i++)
             {
@@ -67,10 +71,18 @@ namespace PostgisUltilities
 
         public OrientedBoundingBox GetObb()
         {
+            if (AsGeometry() == null)
+            {
+                return null;
+            }
             return new OrientedBoundingBox(AsGeometry());
         }
         public AxisAlignedBoundingBox GetAabb()
         {
+            if (AsGeometry() == null)
+            {
+                return null;
+            }
             return new AxisAlignedBoundingBox(AsGeometry());
         }
     }

@@ -8,11 +8,23 @@ namespace PostgisUltilities
 {
     public class ApiHelper
     {
-        public string baseUrl;
-        public ApiHelper() { }
+        public string baseUrl {  get; set; }
+        /// <summary>
+        /// Create a new API helper with defalt base URL https://localhost:7186
+        /// </summary>
+        public ApiHelper()
+        {
+            baseUrl = $"https://localhost:7186";
+        }
+        /// <summary>
+        /// Get data from the database
+        /// </summary>
+        /// <param name="header">Header of the request.</param>
+        /// <returns>Requested data in JSON format, need to be deserialized in to proper object.</returns>
+        /// <exception cref="Exception"></exception>
         public async Task<string> Get(string header)
         {
-            string endpoint = baseUrl + header;
+            string endpoint = $"{baseUrl}{header}";
 
             using (HttpClient client = new HttpClient())
             {
@@ -29,6 +41,11 @@ namespace PostgisUltilities
             }
         }
 
+        /// <summary>
+        /// Post data to the database
+        /// </summary>
+        /// <param name="header">Header of the request.</param>
+        /// <param name="bodyAsJson">Data to be posted, in proper JSON format.</param>
         public async void Post(string header, string bodyAsJson)
         {
             string endpoint = $"{baseUrl}{header}";
@@ -39,11 +56,11 @@ namespace PostgisUltilities
 
                 if (response.IsSuccessStatusCode)
                 {
-                    MessageBox.Show("Post data to the database successfully.", "Post data successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Post data to the database successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    MessageBox.Show("Post data to the database failed.", $"Failed: {endpoint}", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Post data to the database failed.", $"Failed: {header}", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }

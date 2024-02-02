@@ -30,6 +30,7 @@ namespace PostgisUltilities
             {
                 return null;
             }
+
             List<CoordinateZ> fullVertices = new List<CoordinateZ>();
             for (int i = 0; i < faceIndexes.Count; i++)
             {

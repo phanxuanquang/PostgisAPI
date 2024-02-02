@@ -15,7 +15,7 @@ namespace PostgisUltilities
         public Guid? BatchedModelItemID { get; set; }
         public string Properties { get; set; }
         public DateTime LastModifiedTime { get; set; }
-        public int? FeatureID;
-        public int? GlbIndex;
+        public int? FeatureID { get; set; }
+        public int? GlbIndex { get; set; }
     }
 }

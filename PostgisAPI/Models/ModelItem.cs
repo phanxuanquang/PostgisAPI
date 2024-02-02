@@ -37,9 +37,9 @@ namespace PostgisAPI.Models
         [Column("lastmodifiedtime")]
         public DateTime LastModifiedTime { get; set; } = DateTime.Now;
         [Column("featureid")]
-        public int? FeatureID;
+        public int? FeatureID { get; set; }
         [Column("glbindex")]
-        public int? GlbIndex;
+        public int? GlbIndex {  get; set; }
 
         public DTO.ModelItemGetDTO AsDTO()
         {

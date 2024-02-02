@@ -14,7 +14,6 @@ namespace PostgisUltilities
             this.y = y;
             this.z = z;
         }
-
         private string AsJson()
         {
             return JsonConvert.SerializeObject(this);

@@ -34,9 +34,9 @@ namespace PostgisUltilities
             List<CoordinateZ> fullVertices = new List<CoordinateZ>();
             for (int i = 0; i < faceIndexes.Count; i++)
             {
-                fullVertices.Add(AsCoordinateZ(vertices[faceIndexes[i]]));
+                fullVertices.Add(AsCoordinateZ(vertices[faceIndexes[i] - 1]));
             }
-            fullVertices.Add(AsCoordinateZ(vertices[faceIndexes[0]]));
+            fullVertices.Add(AsCoordinateZ(vertices[faceIndexes[0] - 1]));
 
             LineString lineString = new LineString(null);
             GeometryFactory geometryFactory = new GeometryFactory();
@@ -59,7 +59,6 @@ namespace PostgisUltilities
 
         public bool TouchedBy(PointZ hitPoint)
         {
-
             Point point = new Point(hitPoint.x, hitPoint.y, hitPoint.z);
             return AsGeometry().Touches(point);
         }

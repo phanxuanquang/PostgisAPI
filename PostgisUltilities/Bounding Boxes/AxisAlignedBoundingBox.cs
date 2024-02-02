@@ -24,6 +24,11 @@ namespace PostgisUltilities
         /// <param name="geometry">The input geometry used to create the axis-aligned bounding box.</param>
         public AxisAlignedBoundingBox(Geometry geometry)
         {
+            if(geometry == null)
+            {
+                MinPoint = MaxPoint = new Point(0, 0, 0);
+            }
+
             MinPoint = GetMinPoint(geometry);
             MaxPoint = GetMaxPoint(geometry);
         }
@@ -43,6 +48,10 @@ namespace PostgisUltilities
         }
         private Point GetMaxPoint(Geometry geometry)
         {
+            if (geometry == null)
+            {
+                return new Point(0, 0, 0);
+            }
             double xMax = geometry.Coordinate.X;
             double yMax = geometry.Coordinate.Y;
             double zMax = geometry.Coordinate.Z;
@@ -67,6 +76,10 @@ namespace PostgisUltilities
         }
         private Point GetMinPoint(Geometry geometry)
         {
+            if (geometry == null)
+            {
+                return new Point(0, 0, 0);
+            }
             double xMin = geometry.Coordinate.X;
             double yMin = geometry.Coordinate.Y;
             double zMin = geometry.Coordinate.Z;

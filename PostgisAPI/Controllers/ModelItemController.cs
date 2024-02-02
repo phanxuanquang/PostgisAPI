@@ -378,16 +378,16 @@ namespace PostgisAPI.Controllers
         }
 
         /// <summary>
-        /// Batch model items
+        /// Update feature ID of the model items
         /// </summary>
-        /// <param name="modelId">The GUID of the model contains the model items to be batched.</param>
-        /// <param name="modelItemFeatureIdPairs">The key-value pairs containing GUID of model items (left) and GUID of batched model items (right). The value of the batched model item is nullable. </param>
+        /// <param name="modelId">The GUID of the model contains the model items to be updated.</param>
+        /// <param name="modelItemFeatureIdPairs">The key-value pairs containing GUID of model items (left) and their feature ID (right). The value of the feature ID is nullable. </param>
         /// <returns>A response indicating the success or failure of the operation.</returns>
         /// <response code="200">Success.</response>
         /// <response code="400">Invalid input data or bad request format.</response>
         /// <response code="404">No model items found.</response>
         /// <response code="500">An error occurred while processing the request.</response>
-        [HttpPut("feartureId")]
+        [HttpPut("featureId")]
         [ProducesResponseType(200, Type = typeof(string))]
         [ProducesResponseType(400, Type = typeof(string))]
         [ProducesResponseType(404, Type = typeof(string))]
@@ -434,6 +434,70 @@ namespace PostgisAPI.Controllers
                     if (modelItemFeatureIdPairs.TryGetValue(modelItem.ModelItemID, out int? featureId))
                     {
                         modelItem.FeatureID = featureId;
+                    }
+                }
+            }
+            await context.SaveChangesAsync();
+            return Ok("Success");
+        }
+
+        /// <summary>
+        /// Update GLB index of the model items
+        /// </summary>
+        /// <param name="modelId">The GUID of the model contains the model items to be updated.</param>
+        /// <param name="modelItemGlbIndexPairs">The key-value pairs containing GUID of model items (left) and GLB index (right). The value of the GLB index is nullable. </param>
+        /// <returns>A response indicating the success or failure of the operation.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="400">Invalid input data or bad request format.</response>
+        /// <response code="404">No model items found.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
+        [HttpPut("glbIndex")]
+        [ProducesResponseType(200, Type = typeof(string))]
+        [ProducesResponseType(400, Type = typeof(string))]
+        [ProducesResponseType(404, Type = typeof(string))]
+        [ProducesResponseType(500, Type = typeof(string))]
+        public async Task<IActionResult> UpdateGlbIndex(Guid modelId, [FromBody] Dictionary<Guid, int?> modelItemGlbIndexPairs)
+        {
+            if (modelItemGlbIndexPairs.Count > 5000)
+            {
+                ConcurrentBag<DTO.ModelItemGetDTO> modelItemsToUpdate = new ConcurrentBag<DTO.ModelItemGetDTO>();
+                Parallel.ForEach(context.ModelItems, modelItem =>
+                {
+                    if (modelItem.ModelID == modelId)
+                    {
+                        modelItemsToUpdate.Add(modelItem.AsDTO());
+                    }
+                });
+
+                if (modelItemsToUpdate == null || modelItemsToUpdate.Count == 0)
+                {
+                    return NotFound("Not Found");
+                }
+
+                Parallel.ForEach(modelItemsToUpdate, modelItem =>
+                {
+                    if (modelItemGlbIndexPairs.TryGetValue(modelItem.ModelItemID, out int? glbIndex))
+                    {
+                        modelItem.GlbIndex = glbIndex;
+                    }
+                });
+            }
+            else
+            {
+                List<Models.ModelItem> modelItemsToUpdate = await context.ModelItems
+                                                    .Where(item => item.ModelID == modelId)
+                                                    .ToListAsync();
+
+                if (modelItemsToUpdate == null || modelItemsToUpdate.Count == 0)
+                {
+                    return NotFound("Not Found");
+                }
+
+                foreach (Models.ModelItem? modelItem in modelItemsToUpdate)
+                {
+                    if (modelItemGlbIndexPairs.TryGetValue(modelItem.ModelItemID, out int? glbIndex))
+                    {
+                        modelItem.GlbIndex = glbIndex;
                     }
                 }
             }
